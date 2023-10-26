@@ -13,7 +13,7 @@ public class Selector {
   private boolean selecting = false;
   private Rectangle bound;
 
-  public void display(ShapeRenderer sr, Vector2 mousePos) {
+  public void render(ShapeRenderer sr, Vector2 mousePos) {
     if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
       prevVector = mousePos;
       selecting = true;
