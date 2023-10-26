@@ -29,6 +29,10 @@ public class Entity {
     return new Vector2(hurtbox.x, hurtbox.y);
   }
 
+  public Vector2 getCenter() {
+    return new Vector2(hurtbox.x + hurtbox.width / 2f, hurtbox.y + hurtbox.height / 2f);
+  }
+
   public void setPosition(Vector2 position) {
     hurtbox.x = position.x;
     hurtbox.y = position.y;
