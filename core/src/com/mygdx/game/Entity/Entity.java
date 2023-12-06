@@ -4,8 +4,10 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.GameHelpers.CollisionManager;
+import com.mygdx.game.GameHelpers.ICollidible;
 
-public class Entity {
+public class Entity implements ICollidible {
   private Rectangle hurtbox;
   private ArrayList<Rectangle> hitBoxes;
 
@@ -42,4 +44,26 @@ public class Entity {
     hurtbox.x += velocity.x;
     hurtbox.y += velocity.y;
   }
+
+  public boolean rectangleCollide(Rectangle rectangle) {
+    return hurtbox.contains(rectangle);
+  }
+
+  public boolean lineCollide(Vector2 start, Vector2 end) {
+    return CollisionManager.rectangleLine(hurtbox, start, end);
+  }
+
+  public boolean pointCollide(Vector2 point) {
+    return hurtbox.contains(point);
+  }
+
+  public Vector2[] getVertices() {
+    return new Vector2[] {
+        new Vector2(hurtbox.x, hurtbox.y),
+        new Vector2(hurtbox.x + hurtbox.width, hurtbox.y),
+        new Vector2(hurtbox.x + hurtbox.width, hurtbox.y + hurtbox.height),
+        new Vector2(hurtbox.x, hurtbox.y + hurtbox.height),
+    };
+  }
+
 }

@@ -188,7 +188,7 @@ public class Grid {
       // do a Line/Line comparison
       // if true, return 'true' immediately and
       // stop testing (faster)
-      boolean hit = lineLine(start.x, start.y, end.x, end.y, x3, y3, x4, y4);
+      boolean hit = CollisionManager.lineLine(start.x, start.y, end.x, end.y, x3, y3, x4, y4);
       if (hit) {
         // System.out.println(start + " " + end + " " + new Vector2(x3, y3) + " " + new
         // Vector2(x4, y4));
@@ -196,21 +196,6 @@ public class Grid {
       }
     }
     // never got a hit
-    return false;
-  }
-
-  private boolean lineLine(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
-
-    // calculate the direction of the lines
-    float uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
-    float uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
-
-    // if uA and uB are between 0-1, lines are colliding
-    if (uA > 0 && uA < 1 && uB > 0 && uB < 1) {
-      return true;
-    } else if (uA == 0 || uA == 1 || uB == 0 || uB == 1) {
-      System.out.println(x1 + ", " + y1 + " " + x2 + ", " + y2 + " " + x3 + ", " + y3 + " " + x4 + ", " + y4);
-    }
     return false;
   }
 
@@ -225,7 +210,6 @@ public class Grid {
 
   public void addBuilding(Building building) {
     buildings.add(building);
-    System.out.println(building.getTileX() + HALF_SIZE + " " + (building.getTileY() + HALF_SIZE));
     DestinationNode node = nodes[building.getTileX() + HALF_SIZE][building.getTileY() + HALF_SIZE];
     nodeGraph.removeNode(node);
   }

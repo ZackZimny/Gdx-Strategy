@@ -3,9 +3,13 @@ package com.mygdx.game.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.GameHelpers.CollisionManager;
 import com.mygdx.game.GameHelpers.Grid;
+import com.mygdx.game.GameHelpers.ICollidible;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Polygon;
 
-public class Building {
+public class Building implements ICollidible {
   private Grid grid;
   private int tileX;
   private int tileY;
@@ -39,4 +43,34 @@ public class Building {
     return tileY;
   }
 
+  public boolean lineCollide(Vector2 start, Vector2 end) {
+    Vector2[] vertices = getVertices();
+    for (int i = 0; i < 3; i++) {
+      if (CollisionManager.lineLine(vertices[i], vertices[i + 1], start, end)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean rectangleCollide(Rectangle rectangle) {
+    Vector2[] vertices = getVertices();
+    for (int i = 0; i < 3; i++) {
+      if (CollisionManager.rectangleLine(rectangle, vertices[i], vertices[i + 1])) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean pointCollide(Vector2 point) {
+    Vector2[] vertices = getVertices();
+    float[] floatVertices = new float[8];
+    for (int i = 0; i < vertices.length; i++) {
+      floatVertices[i * 2] = vertices[i].x;
+      floatVertices[i * 2 + 1] = vertices[i].y;
+    }
+    Polygon shape = new Polygon(floatVertices);
+    return shape.contains(point);
+  }
 }
