@@ -38,4 +38,17 @@ public class CollisionManager {
       return true;
     return false;
   }
+
+  public static boolean overlappingColldibles(ICollidible collidible1, ICollidible collidible2) {
+    Vector2[] vertices1 = collidible1.getVertices();
+    Vector2[] vertices2 = collidible2.getVertices();
+    for (int i = 0; i < vertices1.length - 1; i++) {
+      for (int j = 0; j < vertices2.length - 1; j++) {
+        if (lineLine(vertices1[i], vertices1[i + 1], vertices2[j], vertices2[j + 1])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 }

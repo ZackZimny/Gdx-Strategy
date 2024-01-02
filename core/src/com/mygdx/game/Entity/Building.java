@@ -3,6 +3,7 @@ package com.mygdx.game.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.CollisionManager;
 import com.mygdx.game.GameHelpers.Grid;
 import com.mygdx.game.GameHelpers.ICollidible;
@@ -13,15 +14,13 @@ public class Building implements ICollidible {
   private Grid grid;
   private int tileX;
   private int tileY;
-  private Vector2 gridPosition;
-  private Vector2 position;
+  private int cost;
 
-  public Building(Grid grid, int tileX, int tileY) {
+  public Building(Grid grid, int tileX, int tileY, int cost) {
     this.grid = grid;
     this.tileX = tileX;
     this.tileY = tileY;
-    gridPosition = new Vector2(tileX, tileY);
-    position = grid.getIsoCoordinates(gridPosition);
+    this.cost = cost;
   }
 
   public void render(ShapeRenderer sr) {
@@ -72,5 +71,13 @@ public class Building implements ICollidible {
     }
     Polygon shape = new Polygon(floatVertices);
     return shape.contains(point);
+  }
+
+  public int getCost() {
+    return cost;
+  }
+
+  public CollidibleType getCollidibleType() {
+    return CollidibleType.Building;
   }
 }

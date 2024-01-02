@@ -7,22 +7,21 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.CollisionManager;
-import com.mygdx.game.GameHelpers.Grid;
 import com.mygdx.game.GameHelpers.ICollidible;
 import com.mygdx.game.GameHelpers.Selector;
 import java.util.ArrayList;
 
 public class Unit extends Entity {
 
-  private Color color = Color.BLUE;
   private Vector2 currentDestination;
   private boolean stationary;
   private boolean isSelected = false;
   private boolean isClicked = false;
 
   public Unit(Rectangle hurtbox) {
-    super(hurtbox);
+    super(hurtbox, CollidibleType.PlayerUnit);
     currentDestination = null;
   }
 
@@ -46,8 +45,10 @@ public class Unit extends Entity {
     if (selector.getBound() != null && !isBounded && !isClicked) {
       isSelected = false;
     }
+  }
 
-    color = isSelected ? Color.RED : Color.BLUE;
+  public Color getColor() {
+    return isSelected ? Color.RED : Color.BLUE;
   }
 
   public Vector2 getHeading(ArrayList<ICollidible> collidibles, ICollidible collidibleDestination, float depth) {
@@ -93,8 +94,8 @@ public class Unit extends Entity {
       ICollidible collidible = collidibles.get(i);
       for (int j = 0; j < arrivableCollidibles.size(); j++) {
         ICollidible arrivableCollidible = arrivableCollidibles.get(j);
-        if (collidible.equals(arrivableCollidible)
-            || collidible.equals(this) || arrivableCollidibles.contains(collidible)) {
+        if (collidible.equals(arrivableCollidible) || collidible.equals(this)
+            || arrivableCollidibles.contains(collidible)) {
           continue;
         }
         if (CollisionManager.overlappingColldibles(collidible, arrivableCollidible)) {
@@ -110,12 +111,34 @@ public class Unit extends Entity {
     return false;
   }
 
-  public void handleMovement(ArrayList<ICollidible> collidibles, ShapeRenderer sr, Grid grid, Vector2 mousePos,
-      float deltaTime) {
-    if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && isSelected) {
-      currentDestination = mousePos;
-      stationary = false;
+  protected ICollidible getNearestCollidibleType(ArrayList<ICollidible> collidibles, CollidibleType collidibleType) {
+    float recordDistance = getPosition().dst(collidibles.get(0).getVertices()[0]);
+    ICollidible closestCollidible = collidibles.get(0);
+    for (ICollidible collidible : collidibles) {
+      float distance = collidible.getVertices()[0].dst(getPosition());
+      if (distance < recordDistance) {
+        recordDistance = distance;
+        closestCollidible = collidible;
+      }
     }
+    return closestCollidible;
+  }
+
+  protected void updateCurrentDestination(ArrayList<ICollidible> collidibles, Vector2 mousePos, String mode) {
+    if (!(Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT) && isSelected)) {
+      return;
+    }
+    stationary = false;
+    if (mode.equals("Move")) {
+      currentDestination = mousePos;
+    } else if (mode.equals("Fight")) {
+      currentDestination = getNearestCollidibleType(collidibles, CollidibleType.EnemyUnit).getVertices()[0];
+    }
+  }
+
+  public void handleMovement(ArrayList<ICollidible> collidibles, ShapeRenderer sr, Vector2 mousePos, float deltaTime,
+      String mode) {
+    updateCurrentDestination(collidibles, mousePos, mode);
     if (stationary || currentDestination == null) {
       return;
     }
@@ -148,12 +171,10 @@ public class Unit extends Entity {
     if (selector.getBound() == null) {
       return false;
     }
-    Vector2[] points = {
-        new Vector2(getHurtbox().getX(), getHurtbox().getY()),
+    Vector2[] points = { new Vector2(getHurtbox().getX(), getHurtbox().getY()),
         new Vector2(getHurtbox().getX() + getHurtbox().getWidth(), getHurtbox().getY()),
         new Vector2(getHurtbox().getX() + getHurtbox().getWidth(), getHurtbox().getY() + getHurtbox().getHeight()),
-        new Vector2(getHurtbox().getX(), getHurtbox().getY() + getHurtbox().getHeight())
-    };
+        new Vector2(getHurtbox().getX(), getHurtbox().getY() + getHurtbox().getHeight()) };
     boolean isBounded = false;
     for (int i = 0; i < points.length; i++) {
       if (selector.getBound().contains(points[i])) {
@@ -169,7 +190,7 @@ public class Unit extends Entity {
     sr.rect(getHurtbox().getX(), getHurtbox().getY(), getHurtbox().getWidth(), getHurtbox().getHeight());
     sr.end();
     float padding = 10f;
-    sr.setColor(color);
+    sr.setColor(getColor());
     sr.begin(ShapeType.Filled);
     sr.rect(getHurtbox().getX() + padding / 2f, getHurtbox().getY() + padding / 2f, getHurtbox().getWidth() - padding,
         getHurtbox().getHeight() - padding);
@@ -184,4 +205,7 @@ public class Unit extends Entity {
     return stationary;
   }
 
+  protected void setCurrentDestination(Vector2 collidibleDestination) {
+    this.currentDestination = collidibleDestination;
+  }
 }

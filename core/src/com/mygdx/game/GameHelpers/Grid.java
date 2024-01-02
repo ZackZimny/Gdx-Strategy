@@ -11,9 +11,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Entity.Building;
-import com.mygdx.game.Pathfinding.DestinationNode;
-import com.mygdx.game.Pathfinding.NodeConnection;
-import com.mygdx.game.Pathfinding.NodeGraph;
 import com.badlogic.gdx.math.Vector2;
 
 public class Grid {
@@ -21,44 +18,15 @@ public class Grid {
   private float tileHeight;
   private float tileWidthHalf;
   private float tileHeightHalf;
-  private static int SIZE = 20;
+  private static int SIZE = 400;
   private static int HALF_SIZE = SIZE / 2;
   private ArrayList<Building> buildings = new ArrayList<>();
-  private NodeGraph nodeGraph = new NodeGraph();
-  private DestinationNode[][] nodes = new DestinationNode[SIZE][SIZE];
 
   public Grid(int width, int height) {
     tileWidth = width;
     tileHeight = height;
     tileWidthHalf = tileWidth / 2f;
     tileHeightHalf = tileHeight / 2f;
-    for (int i = -HALF_SIZE; i < HALF_SIZE; i++) {
-      for (int j = -HALF_SIZE; j < HALF_SIZE; j++) {
-        DestinationNode node = new DestinationNode(getIsoCenter(i, j));
-        nodeGraph.addNode(node);
-        nodes[i + HALF_SIZE][j + HALF_SIZE] = node;
-      }
-    }
-    connectNodes();
-  }
-
-  private void connectNodes() {
-    for (int i = 0; i < SIZE; i++) {
-      for (int j = 0; j < SIZE; j++) {
-        if (i + 1 < SIZE) {
-          nodeGraph.connectNodes(nodes[i][j], nodes[i + 1][j]);
-          nodeGraph.connectNodes(nodes[i + 1][j], nodes[i][j]);
-        }
-        if (j + 1 < SIZE) {
-          nodeGraph.connectNodes(nodes[i][j], nodes[i][j + 1]);
-          nodeGraph.connectNodes(nodes[i][j + 1], nodes[i][j]);
-        }
-        if (i + 1 < SIZE && j + 1 < SIZE) {
-          nodeGraph.connectNodes(nodes[i][j], nodes[i + 1][j + 1]);
-          nodeGraph.connectNodes(nodes[i + 1][j + 1], nodes[i][j]);
-        }
-      }
-    }
   }
 
   private void drawTile(ShapeRenderer sr, int row, int column) {
@@ -154,7 +122,6 @@ public class Grid {
     for (Building building : buildings) {
       building.render(sr);
     }
-    nodeGraph.render(sr);
   }
 
   private boolean tileContainsLine(int row, int column, Vector2 start, Vector2 end) {
@@ -210,20 +177,10 @@ public class Grid {
 
   public void addBuilding(Building building) {
     buildings.add(building);
-    DestinationNode node = nodes[building.getTileX() + HALF_SIZE][building.getTileY() + HALF_SIZE];
-    nodeGraph.removeNode(node);
   }
 
   public ArrayList<Building> getBuildings() {
     return buildings;
-  }
-
-  public NodeGraph getNodeGraph() {
-    return nodeGraph;
-  }
-
-  public DestinationNode getNode(int row, int column) {
-    return nodes[row][column];
   }
 
 }

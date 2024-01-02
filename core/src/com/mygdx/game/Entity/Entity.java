@@ -6,13 +6,16 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollisionManager;
 import com.mygdx.game.GameHelpers.ICollidible;
+import com.mygdx.game.GameHelpers.CollidibleType;
 
 public class Entity implements ICollidible {
   private Rectangle hurtbox;
   private ArrayList<Rectangle> hitBoxes;
+  private CollidibleType collidibleType;
 
-  public Entity(Rectangle hurtbox) {
+  public Entity(Rectangle hurtbox, CollidibleType collidibleType) {
     this.hurtbox = hurtbox;
+    this.collidibleType = collidibleType;
   }
 
   // Method to be overwritten
@@ -57,6 +60,10 @@ public class Entity implements ICollidible {
     return hurtbox.contains(point);
   }
 
+  public CollidibleType getCollidibleType() {
+    return collidibleType;
+  }
+
   public Vector2[] getVertices() {
     return new Vector2[] {
         new Vector2(hurtbox.x, hurtbox.y),
@@ -65,5 +72,4 @@ public class Entity implements ICollidible {
         new Vector2(hurtbox.x, hurtbox.y + hurtbox.height),
     };
   }
-
 }
