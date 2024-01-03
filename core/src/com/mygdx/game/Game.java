@@ -21,7 +21,7 @@ import com.mygdx.game.UI.ButtonGroup;
 import com.mygdx.game.Entity.Unit;
 import com.mygdx.game.Entity.Building;
 import com.mygdx.game.Entity.EnemyUnit;
-import com.mygdx.game.Entity.Entity;
+import com.mygdx.game.Entity.PlayerUnit;
 
 public class Game extends ApplicationAdapter {
   SpriteBatch batch;
@@ -32,7 +32,7 @@ public class Game extends ApplicationAdapter {
   Selector selector;
   ArrayList<Building> buildings = new ArrayList<>();
   ArrayList<ICollidible> collidibles = new ArrayList<>();
-  ArrayList<Unit> units = new ArrayList<>();
+  ArrayList<PlayerUnit> playerUnits = new ArrayList<>();
   ButtonGroup buttonGroup;
   SpriteBatch spriteBatch;
   ItemHandler itemHandler;
@@ -47,11 +47,11 @@ public class Game extends ApplicationAdapter {
     grid = new Grid(64, 32);
     selector = new Selector();
     for (int i = 0; i < 5; i++) {
-      Unit newUnit = new Unit(new Rectangle(i * 20, i * 20, 22, 22));
-      units.add(newUnit);
+      PlayerUnit newUnit = new PlayerUnit(new Rectangle(i * 20, i * 20, 22, 22));
+      playerUnits.add(newUnit);
       collidibles.add(newUnit);
     }
-    enemyUnit = new EnemyUnit(new Rectangle(500, 500, 28, 28));
+    enemyUnit = new EnemyUnit(new Rectangle(200, 500, 28, 28));
     collidibles.add(enemyUnit);
     buttonGroup = new ButtonGroup(new String[] { "Move", "Fight", "Build" }, "Move");
     spriteBatch = new SpriteBatch();
@@ -87,7 +87,7 @@ public class Game extends ApplicationAdapter {
     sr.setColor(0, 0, 0, 1);
     Vector2 mousePos = getMousePos(viewport);
     String mode = buttonGroup.getCurrentAction(mousePos);
-    for (Unit unit : units) {
+    for (PlayerUnit unit : playerUnits) {
       unit.handleSelection(selector, mousePos, deltaTime);
       unit.handleMovement(collidibles, sr, mousePos, deltaTime, mode);
     }
@@ -101,7 +101,7 @@ public class Game extends ApplicationAdapter {
     for (Building building : grid.getBuildings()) {
       building.render(sr);
     }
-    for (Unit unit : units) {
+    for (Unit unit : playerUnits) {
       unit.render(sr);
     }
     enemyUnit.render(sr);
