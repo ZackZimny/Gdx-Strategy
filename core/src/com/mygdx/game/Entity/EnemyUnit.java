@@ -8,8 +8,11 @@ import com.mygdx.game.GameHelpers.ICollidible;
 import java.util.ArrayList;
 
 public class EnemyUnit extends Unit {
+  ICollidible collidibleDestination = null;
+
   public EnemyUnit(Rectangle rectangle) {
-    super(rectangle);
+    super(rectangle, CollidibleType.EnemyUnit);
+    setArriveThroughTree(new CollidibleType[] { CollidibleType.PlayerUnit });
   }
 
   @Override
@@ -19,6 +22,15 @@ public class EnemyUnit extends Unit {
 
   @Override
   protected void updateCurrentDestination(ArrayList<ICollidible> collidibles, Vector2 mousePos, String mode) {
-    setCurrentDestination(getNearestCollidibleType(collidibles, CollidibleType.PlayerUnit).getVertices()[0]);
+    collidibleDestination = getNearestCollidibleType(collidibles, CollidibleType.PlayerUnit);
+    setCurrentDestination(collidibleDestination.getVertices()[0]);
+  }
+
+  @Override
+  protected ICollidible getCollidibleDestination(ArrayList<ICollidible> collidibles) {
+    if (collidibleDestination != null) {
+      return collidibleDestination;
+    }
+    return super.getCollidibleDestination(collidibles);
   }
 }

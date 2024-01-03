@@ -10,45 +10,26 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.CollisionManager;
 import com.mygdx.game.GameHelpers.ICollidible;
-import com.mygdx.game.GameHelpers.Selector;
+import com.mygdx.game.GameHelpers.ItemType;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Unit extends Entity {
 
   private Vector2 currentDestination;
   private boolean stationary;
   private boolean isSelected = false;
-  private boolean isClicked = false;
+  private CollidibleType[] arriveThroughTree;
 
-  public Unit(Rectangle hurtbox) {
-    super(hurtbox, CollidibleType.PlayerUnit);
+  public Unit(Rectangle hurtbox, CollidibleType collidibleType) {
+    super(hurtbox, collidibleType);
     currentDestination = null;
-  }
-
-  public void handleSelection(Selector selector, Vector2 mousePos, float deltaTime) {
-    boolean isBounded = isBounded(selector);
-
-    if (isBounded) {
-      isSelected = true;
-    }
-
-    if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-      if (getHurtbox().contains(mousePos)) {
-        isClicked = true;
-        isSelected = true;
-      } else {
-        isClicked = false;
-        isSelected = false;
-      }
-    }
-
-    if (selector.getBound() != null && !isBounded && !isClicked) {
-      isSelected = false;
-    }
+    arriveThroughTree = new CollidibleType[] { collidibleType };
   }
 
   public Color getColor() {
-    return isSelected ? Color.RED : Color.BLUE;
+    return Color.ORANGE;
   }
 
   public Vector2 getHeading(ArrayList<ICollidible> collidibles, ICollidible collidibleDestination, float depth) {
@@ -72,7 +53,7 @@ public class Unit extends Entity {
     return detection.nor();
   }
 
-  private ICollidible getCollidibleDestination(ArrayList<ICollidible> collidibles) {
+  protected ICollidible getCollidibleDestination(ArrayList<ICollidible> collidibles) {
     for (ICollidible collidible : collidibles) {
       if (!collidible.equals(this) && collidible.pointCollide(currentDestination)) {
         return collidible;
@@ -91,8 +72,8 @@ public class Unit extends Entity {
     ArrayList<ICollidible> arrivableCollidibles = new ArrayList<>();
     arrivableCollidibles.add(collidibleDestination);
     for (int i = 0; i < collidibles.size(); i++) {
-      ICollidible collidible = collidibles.get(i);
       for (int j = 0; j < arrivableCollidibles.size(); j++) {
+        ICollidible collidible = collidibles.get(i);
         ICollidible arrivableCollidible = arrivableCollidibles.get(j);
         if (collidible.equals(arrivableCollidible) || collidible.equals(this)
             || arrivableCollidibles.contains(collidible)) {
@@ -112,9 +93,12 @@ public class Unit extends Entity {
   }
 
   protected ICollidible getNearestCollidibleType(ArrayList<ICollidible> collidibles, CollidibleType collidibleType) {
-    float recordDistance = getPosition().dst(collidibles.get(0).getVertices()[0]);
-    ICollidible closestCollidible = collidibles.get(0);
+    float recordDistance = Float.MAX_VALUE;
+    ICollidible closestCollidible = null;
     for (ICollidible collidible : collidibles) {
+      if (collidible.equals(this) || !collidible.getCollidibleType().equals(collidibleType)) {
+        continue;
+      }
       float distance = collidible.getVertices()[0].dst(getPosition());
       if (distance < recordDistance) {
         recordDistance = distance;
@@ -129,11 +113,7 @@ public class Unit extends Entity {
       return;
     }
     stationary = false;
-    if (mode.equals("Move")) {
-      currentDestination = mousePos;
-    } else if (mode.equals("Fight")) {
-      currentDestination = getNearestCollidibleType(collidibles, CollidibleType.EnemyUnit).getVertices()[0];
-    }
+    currentDestination = mousePos;
   }
 
   public void handleMovement(ArrayList<ICollidible> collidibles, ShapeRenderer sr, Vector2 mousePos, float deltaTime,
@@ -149,39 +129,20 @@ public class Unit extends Entity {
     Vector2 velocity = heading.cpy().scl(deltaTime * 60f);
     Vector2 detectionEnd = getCenter().cpy().add(heading.cpy().scl(detectionDepth));
     boolean arrivedAtDestination = currentDestination != null && currentDestination.epsilonEquals(getCenter(), 3);
-    boolean destinationIsBuilding = collidibleDestination != null
-        && collidibleDestination.getClass().equals(Building.class);
-    boolean arrivatedAtCollidble = false;
+    boolean arrivatedAtCollidible = false;
     if (collidibleDestination != null) {
-      if (destinationIsBuilding) {
-        arrivatedAtCollidble = CollisionManager.overlappingColldibles(this, collidibleDestination);
+      if (!Arrays.asList(arriveThroughTree).contains(collidibleDestination.getCollidibleType())) {
+        arrivatedAtCollidible = CollisionManager.overlappingColldibles(this, collidibleDestination);
       } else {
-        arrivatedAtCollidble = arrivedAtColldibleTree(collidibles, collidibleDestination);
+        arrivatedAtCollidible = arrivedAtColldibleTree(collidibles, collidibleDestination);
       }
     }
-    if (!(arrivedAtDestination || arrivatedAtCollidble)) {
+    if (!(arrivedAtDestination || arrivatedAtCollidible)) {
       changePosition(velocity);
     }
     sr.begin();
     sr.line(getCenter(), detectionEnd);
     sr.end();
-  }
-
-  public boolean isBounded(Selector selector) {
-    if (selector.getBound() == null) {
-      return false;
-    }
-    Vector2[] points = { new Vector2(getHurtbox().getX(), getHurtbox().getY()),
-        new Vector2(getHurtbox().getX() + getHurtbox().getWidth(), getHurtbox().getY()),
-        new Vector2(getHurtbox().getX() + getHurtbox().getWidth(), getHurtbox().getY() + getHurtbox().getHeight()),
-        new Vector2(getHurtbox().getX(), getHurtbox().getY() + getHurtbox().getHeight()) };
-    boolean isBounded = false;
-    for (int i = 0; i < points.length; i++) {
-      if (selector.getBound().contains(points[i])) {
-        isBounded = true;
-      }
-    }
-    return isBounded;
   }
 
   public void render(ShapeRenderer sr) {
@@ -197,15 +158,16 @@ public class Unit extends Entity {
     sr.end();
   }
 
-  public boolean isSelected() {
-    return isSelected;
-  }
-
-  public boolean isStationary() {
-    return stationary;
-  }
-
   protected void setCurrentDestination(Vector2 collidibleDestination) {
     this.currentDestination = collidibleDestination;
   }
+
+  protected Vector2 getCurrentDestination() {
+    return currentDestination;
+  }
+
+  protected void setArriveThroughTree(CollidibleType[] arriveThroughTree) {
+    this.arriveThroughTree = arriveThroughTree;
+  }
+
 }
