@@ -1,63 +1,38 @@
 package com.mygdx.game.Entity;
 
-import java.util.ArrayList;
-
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.GameHelpers.CollisionManager;
-import com.mygdx.game.GameHelpers.ICollidible;
+import com.mygdx.game.GameHelpers.Collidible;
 import com.mygdx.game.GameHelpers.CollidibleType;
+import com.mygdx.game.GameHelpers.GameState;
 
-public class Entity implements ICollidible {
-  private Rectangle hurtbox;
-  private ArrayList<Rectangle> hitBoxes;
+public abstract class Entity {
+  private Collidible collidible;
   private CollidibleType collidibleType;
 
-  public Entity(Rectangle hurtbox, CollidibleType collidibleType) {
-    this.hurtbox = hurtbox;
+  public Entity(Collidible collidible, CollidibleType collidibleType) {
+    this.collidible = collidible;
     this.collidibleType = collidibleType;
   }
 
-  // Method to be overwritten
-  public void display() {
-  }
+  public abstract void render(ShapeRenderer sr);
 
-  public Rectangle getHurtbox() {
-    return hurtbox;
-  }
-
-  public ArrayList<Rectangle> getHitboxes() {
-    return hitBoxes;
-  }
-
-  public Vector2 getPosition() {
-    return new Vector2(hurtbox.x, hurtbox.y);
-  }
+  public abstract void updateState(GameState gameState);
 
   public Vector2 getCenter() {
-    return new Vector2(hurtbox.x + hurtbox.width / 2f, hurtbox.y + hurtbox.height / 2f);
+    return collidible.getCenter();
   }
 
-  public void setPosition(Vector2 position) {
-    hurtbox.x = position.x;
-    hurtbox.y = position.y;
-  }
-
-  public void changePosition(Vector2 velocity) {
-    hurtbox.x += velocity.x;
-    hurtbox.y += velocity.y;
-  }
-
-  public boolean rectangleCollide(Rectangle rectangle) {
-    return hurtbox.contains(rectangle);
+  public void changePosition(Vector2 v) {
+    collidible.changePosition(v);
   }
 
   public boolean lineCollide(Vector2 start, Vector2 end) {
-    return CollisionManager.rectangleLine(hurtbox, start, end);
+    return collidible.lineCollide(start, end);
   }
 
   public boolean pointCollide(Vector2 point) {
-    return hurtbox.contains(point);
+    return collidible.pointCollide(point);
   }
 
   public CollidibleType getCollidibleType() {
@@ -65,11 +40,10 @@ public class Entity implements ICollidible {
   }
 
   public Vector2[] getVertices() {
-    return new Vector2[] {
-        new Vector2(hurtbox.x, hurtbox.y),
-        new Vector2(hurtbox.x + hurtbox.width, hurtbox.y),
-        new Vector2(hurtbox.x + hurtbox.width, hurtbox.y + hurtbox.height),
-        new Vector2(hurtbox.x, hurtbox.y + hurtbox.height),
-    };
+    return collidible.getVertices();
+  }
+
+  public Collidible getCollidible() {
+    return collidible;
   }
 }

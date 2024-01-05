@@ -20,7 +20,6 @@ public class Grid {
   private float tileHeightHalf;
   private static int SIZE = 400;
   private static int HALF_SIZE = SIZE / 2;
-  private ArrayList<Building> buildings = new ArrayList<>();
 
   public Grid(int width, int height) {
     tileWidth = width;
@@ -119,68 +118,6 @@ public class Grid {
       }
     }
     sr.end();
-    for (Building building : buildings) {
-      building.render(sr);
-    }
-  }
-
-  private boolean tileContainsLine(int row, int column, Vector2 start, Vector2 end) {
-    Vector2[] vertices = getVertices(row, column);
-    for (int i = 0; i < vertices.length; i++) {
-      for (int j = i; j < vertices.length; j++) {
-        if ((start.equals(vertices[i]) && end.equals(vertices[j]))
-            || (start.equals(vertices[j]) && end.equals(vertices[i]))) {
-          return true;
-        }
-      }
-    }
-    // go through each of the vertices, plus the next
-    // vertex in the list
-    int next = 0;
-    for (int current = 0; current < vertices.length; current++) {
-
-      // get next vertex in list
-      // if we've hit the end, wrap around to 0
-      next = current + 1;
-      if (next == vertices.length)
-        next = 0;
-
-      // get the PVectors at our current position
-      // extract X/Y coordinates from each
-      float x3 = vertices[current].x;
-      float y3 = vertices[current].y;
-      float x4 = vertices[next].x;
-      float y4 = vertices[next].y;
-
-      // do a Line/Line comparison
-      // if true, return 'true' immediately and
-      // stop testing (faster)
-      boolean hit = CollisionManager.lineLine(start.x, start.y, end.x, end.y, x3, y3, x4, y4);
-      if (hit) {
-        // System.out.println(start + " " + end + " " + new Vector2(x3, y3) + " " + new
-        // Vector2(x4, y4));
-        return true;
-      }
-    }
-    // never got a hit
-    return false;
-  }
-
-  public boolean buildingContainsLine(Vector2 start, Vector2 end) {
-    for (Building building : buildings) {
-      if (tileContainsLine(building.getTileX(), building.getTileY(), start, end)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public void addBuilding(Building building) {
-    buildings.add(building);
-  }
-
-  public ArrayList<Building> getBuildings() {
-    return buildings;
   }
 
 }

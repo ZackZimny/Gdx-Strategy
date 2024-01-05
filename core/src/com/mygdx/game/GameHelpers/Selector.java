@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
 import java.math.*;
@@ -39,7 +40,7 @@ public class Selector {
         height = -height;
       }
       bound = new Rectangle(x, y, width, height);
-      sr.begin();
+      sr.begin(ShapeType.Line);
       sr.setColor(Color.GOLD);
       sr.rect(bound.x, bound.y, bound.width, bound.height);
       sr.end();
