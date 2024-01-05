@@ -2,21 +2,24 @@ package com.mygdx.game.Entity;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.GameHelpers.Collidible;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.CollisionManager;
+import com.mygdx.game.GameHelpers.GameState;
 import com.mygdx.game.GameHelpers.Grid;
-import com.mygdx.game.GameHelpers.ICollidible;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Polygon;
 
-public class Building implements ICollidible {
+public class Building extends Entity {
   private Grid grid;
   private int tileX;
   private int tileY;
   private int cost;
 
   public Building(Grid grid, int tileX, int tileY, int cost) {
+    super(new Collidible(grid.getVertices(tileX, tileY), CollidibleType.Building), CollidibleType.Building);
     this.grid = grid;
     this.tileX = tileX;
     this.tileY = tileY;
@@ -24,7 +27,7 @@ public class Building implements ICollidible {
   }
 
   public void render(ShapeRenderer sr) {
-    sr.begin();
+    sr.begin(ShapeType.Line);
     sr.setColor(Color.ORANGE);
     grid.renderTile(sr, tileX, tileY);
     sr.end();
@@ -50,6 +53,10 @@ public class Building implements ICollidible {
       }
     }
     return false;
+  }
+
+  public void updateState(GameState gameState) {
+    // do nothing
   }
 
   public boolean rectangleCollide(Rectangle rectangle) {

@@ -4,14 +4,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
-import com.mygdx.game.GameHelpers.ICollidible;
+import com.mygdx.game.GameHelpers.Collidible;
+import com.mygdx.game.GameHelpers.RectangleCollidible;
 import java.util.ArrayList;
+import java.util.List;
 
 public class EnemyUnit extends Unit {
-  ICollidible collidibleDestination = null;
+  Collidible collidibleDestination = null;
 
-  public EnemyUnit(Rectangle rectangle) {
-    super(rectangle, CollidibleType.EnemyUnit);
+  public EnemyUnit(RectangleCollidible hurtBox) {
+    super(hurtBox, CollidibleType.EnemyUnit, 15f);
     setArriveThroughTree(new CollidibleType[] { CollidibleType.PlayerUnit });
   }
 
@@ -21,16 +23,20 @@ public class EnemyUnit extends Unit {
   }
 
   @Override
-  protected void updateCurrentDestination(ArrayList<ICollidible> collidibles, Vector2 mousePos, String mode) {
+  protected void updateCurrentDestination(List<Collidible> collidibles, Vector2 mousePos, String mode) {
     collidibleDestination = getNearestCollidibleType(collidibles, CollidibleType.PlayerUnit);
-    setCurrentDestination(collidibleDestination.getVertices()[0]);
+    setCurrentDestination(collidibleDestination.getCenter());
   }
 
   @Override
-  protected ICollidible getCollidibleDestination(ArrayList<ICollidible> collidibles) {
+  protected Collidible getCollidibleDestination(List<Collidible> collidibles) {
     if (collidibleDestination != null) {
       return collidibleDestination;
     }
     return super.getCollidibleDestination(collidibles);
+  }
+
+  protected void updateHealth(List<Unit> units) {
+    updateHealthOnCollisionWithUnitType(units, CollidibleType.PlayerUnit);
   }
 }

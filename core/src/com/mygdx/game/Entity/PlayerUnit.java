@@ -3,26 +3,26 @@ package com.mygdx.game.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
-import com.mygdx.game.GameHelpers.ICollidible;
+import com.mygdx.game.GameHelpers.GameState;
+import com.mygdx.game.GameHelpers.RectangleCollidible;
+import com.mygdx.game.GameHelpers.Collidible;
 import com.mygdx.game.GameHelpers.Selector;
-import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerUnit extends Unit {
   private boolean stationary;
   private boolean isSelected = false;
   private boolean isClicked = false;
-  private ICollidible collidibleDestination = null;
-  private float attackPower = 2f;
+  private Collidible collidibleDestination = null;
 
-  public PlayerUnit(Rectangle hurtbox) {
-    super(hurtbox, CollidibleType.PlayerUnit);
+  public PlayerUnit(RectangleCollidible hurtbox) {
+    super(hurtbox, CollidibleType.PlayerUnit, 20f);
     setCurrentDestination(null);
   }
 
-  public void handleSelection(Selector selector, Vector2 mousePos, float deltaTime) {
+  public void handleSelection(Selector selector, Vector2 mousePos) {
     boolean isBounded = isBounded(selector);
 
     if (isBounded) {
@@ -30,7 +30,7 @@ public class PlayerUnit extends Unit {
     }
 
     if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-      if (getHurtbox().contains(mousePos)) {
+      if (pointCollide(mousePos)) {
         isClicked = true;
         isSelected = true;
       } else {
@@ -45,46 +45,50 @@ public class PlayerUnit extends Unit {
   }
 
   @Override
+  public void updateState(GameState gameState) {
+    handleSelection(gameState.getSelector(), gameState.getMousePos());
+    super.updateState(gameState);
+  }
+
+  @Override
   public Color getColor() {
     return isSelected ? Color.RED : Color.BLUE;
   }
 
   @Override
-  protected void updateCurrentDestination(ArrayList<ICollidible> collidibles, Vector2 mousePos, String mode) {
+  protected void updateCurrentDestination(List<Collidible> collidibles, Vector2 mousePos, String mode) {
     if (mode.equals("Move") && isSelected() && Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
       setCurrentDestination(mousePos);
       collidibleDestination = super.getCollidibleDestination(collidibles);
     } else if (mode.equals("Fight") && isSelected()) {
-      ICollidible nearestEnemy = getNearestCollidibleType(collidibles, CollidibleType.EnemyUnit);
-      System.out.println(nearestEnemy);
-      setCurrentDestination(nearestEnemy.getVertices()[0]);
+      Collidible nearestEnemy = getNearestCollidibleType(collidibles, CollidibleType.EnemyUnit);
+      setCurrentDestination(nearestEnemy.getCenter());
       collidibleDestination = nearestEnemy;
     }
   }
 
   @Override
-  protected ICollidible getCollidibleDestination(ArrayList<ICollidible> collidibles) {
+  protected Collidible getCollidibleDestination(List<Collidible> collidibles) {
     if (collidibleDestination != null) {
       return collidibleDestination;
     }
     return super.getCollidibleDestination(collidibles);
   }
 
+  protected void updateHealth(List<Unit> units) {
+    updateHealthOnCollisionWithUnitType(units, CollidibleType.EnemyUnit);
+  }
+
   public boolean isBounded(Selector selector) {
     if (selector.getBound() == null) {
       return false;
     }
-    Vector2[] points = { new Vector2(getHurtbox().getX(), getHurtbox().getY()),
-        new Vector2(getHurtbox().getX() + getHurtbox().getWidth(), getHurtbox().getY()),
-        new Vector2(getHurtbox().getX() + getHurtbox().getWidth(), getHurtbox().getY() + getHurtbox().getHeight()),
-        new Vector2(getHurtbox().getX(), getHurtbox().getY() + getHurtbox().getHeight()) };
-    boolean isBounded = false;
-    for (int i = 0; i < points.length; i++) {
-      if (selector.getBound().contains(points[i])) {
-        isBounded = true;
+    for (Vector2 verticy : getVertices()) {
+      if (selector.getBound().contains(verticy)) {
+        return true;
       }
     }
-    return isBounded;
+    return false;
   }
 
   public boolean isSelected() {
@@ -94,4 +98,9 @@ public class PlayerUnit extends Unit {
   public boolean isStationary() {
     return stationary;
   }
+
+  public boolean isClicked() {
+    return isClicked;
+  }
+
 }

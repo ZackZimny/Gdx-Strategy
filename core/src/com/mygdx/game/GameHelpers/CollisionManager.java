@@ -39,7 +39,7 @@ public class CollisionManager {
     return false;
   }
 
-  public static boolean overlappingColldibles(ICollidible collidible1, ICollidible collidible2) {
+  public static boolean overlappingColldibles(Collidible collidible1, Collidible collidible2) {
     Vector2[] vertices1 = collidible1.getVertices();
     Vector2[] vertices2 = collidible2.getVertices();
     for (int i = 0; i < vertices1.length - 1; i++) {
