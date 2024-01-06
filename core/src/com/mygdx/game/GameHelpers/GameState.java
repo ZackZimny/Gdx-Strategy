@@ -1,7 +1,9 @@
 package com.mygdx.game.GameHelpers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.badlogic.gdx.Gdx;
@@ -14,7 +16,9 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Entity.Building;
 import com.mygdx.game.Entity.EnemyUnit;
 import com.mygdx.game.Entity.Entity;
+import com.mygdx.game.Entity.HumanUnit;
 import com.mygdx.game.Entity.PlayerUnit;
+import com.mygdx.game.Entity.RobotUnit;
 import com.mygdx.game.UI.ButtonGroup;
 
 public class GameState {
@@ -28,15 +32,16 @@ public class GameState {
   private List<Collidible> collidibles = new ArrayList<>();
   private Viewport viewport;
 
-  public GameState(Viewport viewport) {
+  public GameState(Viewport viewport) throws IOException {
     grid = new Grid(64, 32);
     selector = new Selector();
     buttonGroup = new ButtonGroup(new String[] { "Move", "Build", "Fight" }, "Move");
     itemHandler = new ItemHandler();
     for (int i = 0; i < 5; i++) {
-      entities.add(new PlayerUnit(new RectangleCollidible(i * 50, i * 50, 30, 30, CollidibleType.PlayerUnit)));
+      entities.add(new HumanUnit(new RectangleCollidible(i * 50, i * 50, 30, 30, CollidibleType.PlayerUnit)));
     }
     entities.add(new EnemyUnit(new RectangleCollidible(700, 700, 30, 30, CollidibleType.EnemyUnit)));
+    entities.add(new RobotUnit(new RectangleCollidible(-100, -100, 30, 30, CollidibleType.PlayerUnit)));
     this.viewport = viewport;
   }
 
@@ -56,6 +61,10 @@ public class GameState {
     }
   }
 
+  private void handleDeath() {
+    entities = entities.stream().filter((e) -> !e.isDead()).collect(Collectors.toList());
+  }
+
   public <T extends Entity> List<T> getEntitiesByType(Class<T> type) {
     return entities.stream()
         .filter((e) -> type.isInstance(e))
@@ -64,6 +73,7 @@ public class GameState {
   }
 
   public void update(Viewport viewport) {
+    handleDeath();
     deltaTime = Gdx.graphics.getDeltaTime();
     collidibles = entities.stream().map((e) -> e.getCollidible()).collect(Collectors.toList());
     Vector2 mousePos = getMousePos();

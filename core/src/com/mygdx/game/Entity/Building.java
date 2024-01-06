@@ -19,7 +19,7 @@ public class Building extends Entity {
   private int cost;
 
   public Building(Grid grid, int tileX, int tileY, int cost) {
-    super(new Collidible(grid.getVertices(tileX, tileY), CollidibleType.Building), CollidibleType.Building);
+    super(new Collidible(grid.getVertices(tileX, tileY), CollidibleType.Building), 1000, 0);
     this.grid = grid;
     this.tileX = tileX;
     this.tileY = tileY;

@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.GameState;
 import com.mygdx.game.GameHelpers.RectangleCollidible;
-import com.mygdx.game.GameHelpers.Collidible;
 import com.mygdx.game.GameHelpers.Selector;
 import java.util.List;
 
@@ -15,10 +14,10 @@ public class PlayerUnit extends Unit {
   private boolean stationary;
   private boolean isSelected = false;
   private boolean isClicked = false;
-  private Collidible collidibleDestination = null;
+  private Entity entityDestination = null;
 
-  public PlayerUnit(RectangleCollidible hurtbox) {
-    super(hurtbox, CollidibleType.PlayerUnit, 20f);
+  public PlayerUnit(RectangleCollidible hurtbox, String name) {
+    super(hurtbox, CollidibleType.PlayerUnit, name);
     setCurrentDestination(null);
   }
 
@@ -56,23 +55,25 @@ public class PlayerUnit extends Unit {
   }
 
   @Override
-  protected void updateCurrentDestination(List<Collidible> collidibles, Vector2 mousePos, String mode) {
+  protected void updateCurrentDestination(List<Entity> entities, Vector2 mousePos, String mode) {
     if (mode.equals("Move") && isSelected() && Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
       setCurrentDestination(mousePos);
-      collidibleDestination = super.getCollidibleDestination(collidibles);
+      entityDestination = super.getEntityDestination(entities);
     } else if (mode.equals("Fight") && isSelected()) {
-      Collidible nearestEnemy = getNearestCollidibleType(collidibles, CollidibleType.EnemyUnit);
-      setCurrentDestination(nearestEnemy.getCenter());
-      collidibleDestination = nearestEnemy;
+      Entity nearestEnemy = getNearestEntityType(entities, CollidibleType.EnemyUnit);
+      if (nearestEnemy != null) {
+        setCurrentDestination(nearestEnemy.getCenter());
+        entityDestination = nearestEnemy;
+      }
     }
   }
 
   @Override
-  protected Collidible getCollidibleDestination(List<Collidible> collidibles) {
-    if (collidibleDestination != null) {
-      return collidibleDestination;
+  protected Entity getEntityDestination(List<Entity> entities) {
+    if (entityDestination != null) {
+      return entityDestination;
     }
-    return super.getCollidibleDestination(collidibles);
+    return super.getEntityDestination(entities);
   }
 
   protected void updateHealth(List<Unit> units) {

@@ -9,10 +9,16 @@ import com.mygdx.game.GameHelpers.GameState;
 public abstract class Entity {
   private Collidible collidible;
   private CollidibleType collidibleType;
+  private int health;
+  private int attackPower;
+  private String resourceUsedToMake;
+  private int resourceAmount;
 
-  public Entity(Collidible collidible, CollidibleType collidibleType) {
+  public Entity(Collidible collidible, int health, int attackPower) {
     this.collidible = collidible;
-    this.collidibleType = collidibleType;
+    this.collidibleType = collidible.getCollidibleType();
+    this.health = health;
+    this.attackPower = attackPower;
   }
 
   public abstract void render(ShapeRenderer sr);
@@ -35,6 +41,10 @@ public abstract class Entity {
     return collidible.pointCollide(point);
   }
 
+  public boolean isDead() {
+    return health <= 0;
+  }
+
   public CollidibleType getCollidibleType() {
     return collidibleType;
   }
@@ -45,5 +55,29 @@ public abstract class Entity {
 
   public Collidible getCollidible() {
     return collidible;
+  }
+
+  public void setCollidible(Collidible collidible) {
+    this.collidible = collidible;
+  }
+
+  public void setCollidibleType(CollidibleType collidibleType) {
+    this.collidibleType = collidibleType;
+  }
+
+  public int getHealth() {
+    return health;
+  }
+
+  protected void setHealth(int health) {
+    this.health = health;
+  }
+
+  public int getAttackPower() {
+    return attackPower;
+  }
+
+  protected void setAttackPower(int attackPower) {
+    this.attackPower = attackPower;
   }
 }

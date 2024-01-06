@@ -7,32 +7,48 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.CollisionManager;
 import com.mygdx.game.GameHelpers.GameState;
+import com.mygdx.game.GameHelpers.ItemType;
 import com.mygdx.game.GameHelpers.RectangleCollidible;
 import com.mygdx.game.GameHelpers.Collidible;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public abstract class Unit extends Entity {
 
   private Vector2 currentDestination = null;
   private CollidibleType[] arriveThroughTree;
-  private int attackPower = 2;
-  private int health = 100;
   private RectangleCollidible rectangleCollidible;
-  private float padding;
+  private float padding = 20f;
   private Vector2 detectionEnd;
+  private HashMap<ItemType, Integer> resourcesUsedToRun = new HashMap<>();
 
-  public Unit(RectangleCollidible rectangleCollidible, CollidibleType collidibleType, float padding) {
-    super(rectangleCollidible, collidibleType);
+  public Unit(RectangleCollidible rectangleCollidible, CollidibleType collidibleType, String name) {
+    super(rectangleCollidible, 0, 0);
     currentDestination = null;
     this.rectangleCollidible = rectangleCollidible;
     arriveThroughTree = new CollidibleType[] { collidibleType };
-    this.padding = padding;
+    JsonReader jsonReader = new JsonReader();
+    JsonValue root = jsonReader.parse(Gdx.files.internal("stats.json"));
+    JsonValue stats = root.get("Units").get(name);
+    setHealth(stats.getInt("health"));
+    setAttackPower(stats.getInt("attackPower"));
+    JsonValue resources = stats.get("resourcesUsedToRun");
+    if (resources == null) {
+      return;
+    }
+    for (ItemType type : ItemType.values()) {
+      if (resources.hasChild(type.toString())) {
+        resourcesUsedToRun.put(type, resources.getInt(type.toString()));
+      }
+    }
   }
 
   public abstract Color getColor();
@@ -61,10 +77,11 @@ public abstract class Unit extends Entity {
     return detection.nor();
   }
 
-  protected Collidible getCollidibleDestination(List<Collidible> collidibles) {
-    for (Collidible collidible : collidibles) {
+  protected Entity getEntityDestination(List<Entity> entities) {
+    for (Entity entity : entities) {
+      Collidible collidible = entity.getCollidible();
       if (!collidible.equals(getCollidible()) && collidible.pointCollide(currentDestination)) {
-        return collidible;
+        return entity;
       }
     }
     return null;
@@ -100,23 +117,23 @@ public abstract class Unit extends Entity {
     return false;
   }
 
-  protected Collidible getNearestCollidibleType(List<Collidible> collidibles, CollidibleType collidibleType) {
+  protected Entity getNearestEntityType(List<Entity> entities, CollidibleType collidibleType) {
     float recordDistance = Float.MAX_VALUE;
-    Collidible closestCollidible = null;
-    for (Collidible collidible : collidibles) {
-      if (collidible.equals(getCollidible()) || !collidible.getCollidibleType().equals(collidibleType)) {
+    Entity closestEntity = null;
+    for (Entity entity : entities) {
+      if (entity.getCollidible().equals(getCollidible()) || !entity.getCollidibleType().equals(collidibleType)) {
         continue;
       }
-      float distance = collidible.getVertices()[0].dst(getCenter());
+      float distance = entity.getVertices()[0].dst(getCenter());
       if (distance < recordDistance) {
         recordDistance = distance;
-        closestCollidible = collidible;
+        closestEntity = entity;
       }
     }
-    return closestCollidible;
+    return closestEntity;
   }
 
-  protected abstract void updateCurrentDestination(List<Collidible> entities, Vector2 mousePos, String mode);
+  protected abstract void updateCurrentDestination(List<Entity> entities, Vector2 mousePos, String mode);
 
   protected void updateHealthOnCollisionWithUnitType(List<Unit> units, CollidibleType type) {
     units.stream()
@@ -129,21 +146,23 @@ public abstract class Unit extends Entity {
   @Override
   public void updateState(GameState gameState) {
     updateHealth(gameState.getEntitiesByType(Unit.class));
-    updateCurrentDestination(gameState.getCollidibles(), gameState.getMousePos(), gameState.getActionMode());
+    updateCurrentDestination(gameState.getEntities(), gameState.getMousePos(), gameState.getActionMode());
     if (currentDestination == null) {
       return;
     }
 
-    Collidible collidibleDestination = getCollidibleDestination(gameState.getCollidibles());
+    Entity entityDestination = getEntityDestination(gameState.getEntities());
     float detectionDepth = 70f;
+    Collidible collidibleDestination = entityDestination == null ? null : entityDestination.getCollidible();
     Vector2 heading = getHeading(gameState.getCollidibles(), collidibleDestination, detectionDepth);
     Vector2 velocity = heading.cpy().scl(gameState.getDeltaTime() * 35f);
     detectionEnd = getCenter().cpy().add(heading.cpy().scl(detectionDepth));
     boolean arrivedAtDestination = currentDestination != null && currentDestination.epsilonEquals(getCenter(), 3);
     boolean arrivatedAtCollidible = false;
-    if (collidibleDestination != null) {
-      if (!Arrays.asList(arriveThroughTree).contains(collidibleDestination.getCollidibleType())) {
-        arrivatedAtCollidible = CollisionManager.overlappingColldibles(getCollidible(), collidibleDestination);
+    if (entityDestination != null) {
+      if (!Arrays.asList(arriveThroughTree).contains(entityDestination.getCollidibleType())) {
+        arrivatedAtCollidible = CollisionManager.overlappingColldibles(getCollidible(),
+            collidibleDestination);
       } else {
         arrivatedAtCollidible = arrivedAtColldibleTree(gameState.getCollidibles(), collidibleDestination);
       }
@@ -173,8 +192,8 @@ public abstract class Unit extends Entity {
     }
   }
 
-  protected void setCurrentDestination(Vector2 collidibleDestination) {
-    this.currentDestination = collidibleDestination;
+  protected void setCurrentDestination(Vector2 currentDestination) {
+    this.currentDestination = currentDestination;
   }
 
   protected Vector2 getCurrentDestination() {
@@ -184,17 +203,4 @@ public abstract class Unit extends Entity {
   protected void setArriveThroughTree(CollidibleType[] arriveThroughTree) {
     this.arriveThroughTree = arriveThroughTree;
   }
-
-  public int getAttackPower() {
-    return attackPower;
-  }
-
-  public int getHealth() {
-    return health;
-  }
-
-  protected void setHealth(int health) {
-    this.health = health;
-  }
-
 }
