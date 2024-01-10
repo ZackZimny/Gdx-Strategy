@@ -8,6 +8,8 @@ import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.GameState;
 import com.mygdx.game.GameHelpers.RectangleCollidible;
 import com.mygdx.game.GameHelpers.Selector;
+import com.mygdx.game.UI.ButtonAction;
+
 import java.util.List;
 
 public class PlayerUnit extends Unit {
@@ -55,11 +57,11 @@ public class PlayerUnit extends Unit {
   }
 
   @Override
-  protected void updateCurrentDestination(List<Entity> entities, Vector2 mousePos, String mode) {
-    if (mode.equals("Move") && isSelected() && Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+  protected void updateCurrentDestination(List<Entity> entities, Vector2 mousePos, ButtonAction mode) {
+    if (mode.equals(ButtonAction.Move) && isSelected() && Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
       setCurrentDestination(mousePos);
       entityDestination = super.getEntityDestination(entities);
-    } else if (mode.equals("Fight") && isSelected()) {
+    } else if (mode.equals(ButtonAction.Fight) && isSelected()) {
       Entity nearestEnemy = getNearestEntityType(entities, CollidibleType.EnemyUnit);
       if (nearestEnemy != null) {
         setCurrentDestination(nearestEnemy.getCenter());

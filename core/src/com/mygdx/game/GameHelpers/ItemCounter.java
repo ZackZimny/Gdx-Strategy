@@ -13,6 +13,7 @@ public class ItemCounter {
 
   public void update(float deltaTime) {
     timeElapsed += deltaTime;
+    System.out.println(timeElapsed);
     if (timeElapsed >= creationTime) {
       timeElapsed = 0;
       isConsumable = true;

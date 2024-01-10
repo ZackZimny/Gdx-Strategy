@@ -40,35 +40,32 @@ public class ItemHandler {
     }
   }
 
-  private final String[] ITEMS = { "Money", "Steel", "Energy" };
   private FontHandler fontHandler = new FontHandler();
-  private OrderedMap<String, Item> itemMap;
+  private OrderedMap<ItemType, Item> itemMap;
 
   public ItemHandler() {
     itemMap = new OrderedMap<>();
-    for (String itemName : ITEMS) {
-      ArrayList<ItemCounter> itemCounters = new ArrayList<>();
-      itemCounters.add(new ItemCounter(0.5f, 2));
-      itemMap.put(itemName, new Item(itemName, itemCounters));
+    for (ItemType item : ItemType.values()) {
+      itemMap.put(item, new Item(item.toString(), new ArrayList<>()));
     }
   }
 
   public void update(float deltaTime) {
-    for (String itemName : ITEMS) {
-      itemMap.get(itemName).updateCount(deltaTime);
+    for (ItemType item : ItemType.values()) {
+      itemMap.get(item).updateCount(deltaTime);
     }
   }
 
-  public void addItemCounter(String name, ItemCounter itemCounter) {
-    itemMap.get(name).addItemCounter(itemCounter);
+  public void addItemCounter(ItemType type, ItemCounter itemCounter) {
+    itemMap.get(type).addItemCounter(itemCounter);
   }
 
-  public int getItemCount(String name) {
-    return itemMap.get(name).getCount();
+  public int getItemCount(ItemType itemType) {
+    return itemMap.get(itemType).getCount();
   }
 
-  public void consumeItem(String name, int amount) {
-    itemMap.get(name).consumeItem(amount);
+  public void consumeItem(ItemType type, int amount) {
+    itemMap.get(type).consumeItem(amount);
   }
 
   public void render(SpriteBatch sb) {
@@ -77,10 +74,10 @@ public class ItemHandler {
     float padding = 10f;
     String text = "";
     String longestKey = "";
-    for (String item : itemMap.keys()) {
-      text += String.format("%s: %d\n", item, itemMap.get(item).getCount());
-      if (item.length() > longestKey.length()) {
-        longestKey = item;
+    for (ItemType type : itemMap.keys()) {
+      text += String.format("%s: %d\n", type.toString(), getItemCount(type));
+      if (type.toString().length() > longestKey.length()) {
+        longestKey = type.toString();
       }
     }
     float textWidth = fontHandler.getTextWidth(longestKey + "0000000");

@@ -2,7 +2,12 @@ package com.mygdx.game.Entity;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
@@ -14,44 +19,52 @@ import com.mygdx.game.GameHelpers.CollisionManager;
 import com.mygdx.game.GameHelpers.GameState;
 import com.mygdx.game.GameHelpers.ItemType;
 import com.mygdx.game.GameHelpers.RectangleCollidible;
+import com.mygdx.game.UI.ButtonAction;
 import com.mygdx.game.GameHelpers.Collidible;
 
 import java.util.List;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
 public abstract class Unit extends Entity {
 
+  private enum Direction {
+    Up,
+    Down,
+    Left,
+    Right
+  }
+
   private Vector2 currentDestination = null;
   private CollidibleType[] arriveThroughTree;
   private RectangleCollidible rectangleCollidible;
-  private float padding = 20f;
-  private Vector2 detectionEnd;
+  private Vector2 velocity = new Vector2(0, 0);
   private HashMap<ItemType, Integer> resourcesUsedToRun = new HashMap<>();
+  private HashMap<Direction, Animation<TextureRegion>> animationMap = new HashMap<>();
+  private String name;
+  private float stateTime;
+  private boolean stationary = true;
 
   public Unit(RectangleCollidible rectangleCollidible, CollidibleType collidibleType, String name) {
     super(rectangleCollidible, 0, 0);
     currentDestination = null;
     this.rectangleCollidible = rectangleCollidible;
+    this.name = name;
     arriveThroughTree = new CollidibleType[] { collidibleType };
-    JsonReader jsonReader = new JsonReader();
-    JsonValue root = jsonReader.parse(Gdx.files.internal("stats.json"));
-    JsonValue stats = root.get("Units").get(name);
-    setHealth(stats.getInt("health"));
-    setAttackPower(stats.getInt("attackPower"));
-    JsonValue resources = stats.get("resourcesUsedToRun");
-    if (resources == null) {
-      return;
-    }
-    for (ItemType type : ItemType.values()) {
-      if (resources.hasChild(type.toString())) {
-        resourcesUsedToRun.put(type, resources.getInt(type.toString()));
-      }
-    }
   }
 
   public abstract Color getColor();
+
+  public void generateAnimations(AssetManager assetManager) {
+    for (Direction direction : Direction.values()) {
+      Texture texture = assetManager.get(name + "Walking" + direction.toString() + ".png", Texture.class);
+      TextureRegion[][] regions = TextureRegion.split(texture, 16, 16);
+      Animation<TextureRegion> animation = new Animation<>(1 / 4f, regions[0]);
+      animationMap.put(direction, animation);
+    }
+  }
 
   protected abstract void updateHealth(List<Unit> units);
 
@@ -133,7 +146,7 @@ public abstract class Unit extends Entity {
     return closestEntity;
   }
 
-  protected abstract void updateCurrentDestination(List<Entity> entities, Vector2 mousePos, String mode);
+  protected abstract void updateCurrentDestination(List<Entity> entities, Vector2 mousePos, ButtonAction mode);
 
   protected void updateHealthOnCollisionWithUnitType(List<Unit> units, CollidibleType type) {
     units.stream()
@@ -146,7 +159,7 @@ public abstract class Unit extends Entity {
   @Override
   public void updateState(GameState gameState) {
     updateHealth(gameState.getEntitiesByType(Unit.class));
-    updateCurrentDestination(gameState.getEntities(), gameState.getMousePos(), gameState.getActionMode());
+    updateCurrentDestination(gameState.getEntities(), gameState.getMousePos(), gameState.getButtonAction());
     if (currentDestination == null) {
       return;
     }
@@ -155,8 +168,7 @@ public abstract class Unit extends Entity {
     float detectionDepth = 70f;
     Collidible collidibleDestination = entityDestination == null ? null : entityDestination.getCollidible();
     Vector2 heading = getHeading(gameState.getCollidibles(), collidibleDestination, detectionDepth);
-    Vector2 velocity = heading.cpy().scl(gameState.getDeltaTime() * 35f);
-    detectionEnd = getCenter().cpy().add(heading.cpy().scl(detectionDepth));
+    velocity = heading.cpy().scl(gameState.getDeltaTime() * 35f);
     boolean arrivedAtDestination = currentDestination != null && currentDestination.epsilonEquals(getCenter(), 3);
     boolean arrivatedAtCollidible = false;
     if (entityDestination != null) {
@@ -167,29 +179,39 @@ public abstract class Unit extends Entity {
         arrivatedAtCollidible = arrivedAtColldibleTree(gameState.getCollidibles(), collidibleDestination);
       }
     }
-    if (!(arrivedAtDestination || arrivatedAtCollidible)) {
+    stationary = arrivedAtDestination || arrivatedAtCollidible;
+    if (!stationary) {
       changePosition(velocity);
       rectangleCollidible.changePosition(velocity);
     }
+    stateTime += gameState.getDeltaTime();
   }
 
-  public void render(ShapeRenderer sr) {
+  public void render(ShapeRenderer sr, SpriteBatch sb) {
+    Animation<TextureRegion> animation;
+    if (Math.abs(velocity.x) >= Math.abs(velocity.y)) {
+      animation = velocity.x <= 0 ? animationMap.get(Direction.Left) : animationMap.get(Direction.Right);
+    } else {
+      animation = velocity.y <= 0 ? animationMap.get(Direction.Down) : animationMap.get(Direction.Up);
+    }
+    TextureRegion frame;
+    Color line = stationary ? Color.BLUE : Color.RED;
+    if (stationary) {
+      frame = animationMap.get(Direction.Down).getKeyFrames()[0];
+      stateTime = 0;
+    } else {
+      frame = animation.getKeyFrame(stateTime, true);
+    }
+    Vector2 center = rectangleCollidible.getCenter();
+    sb.begin();
+    sb.draw(frame, center.x - frame.getRegionWidth() / 2, center.y - frame.getRegionHeight() / 2);
+    sb.end();
     sr.begin(ShapeType.Line);
-    sr.setColor(Color.BLACK);
-    sr.rect(rectangleCollidible.getX(), rectangleCollidible.getY(), rectangleCollidible.getWidth(),
+    sr.setColor(line);
+    sr.rect(rectangleCollidible.getX(), rectangleCollidible.getY(),
+        rectangleCollidible.getWidth(),
         rectangleCollidible.getHeight());
     sr.end();
-    sr.setColor(getColor());
-    sr.begin(ShapeType.Filled);
-    sr.rect(rectangleCollidible.getX() + padding / 2f, rectangleCollidible.getY() + padding / 2f,
-        rectangleCollidible.getWidth() - padding,
-        rectangleCollidible.getHeight() - padding);
-    sr.end();
-    if (detectionEnd != null) {
-      sr.begin(ShapeType.Line);
-      sr.line(getCenter(), detectionEnd);
-      sr.end();
-    }
   }
 
   protected void setCurrentDestination(Vector2 currentDestination) {

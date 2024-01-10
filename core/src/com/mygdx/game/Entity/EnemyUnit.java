@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.RectangleCollidible;
+import com.mygdx.game.UI.ButtonAction;
+
 import java.util.List;
 
 public class EnemyUnit extends Unit {
@@ -12,6 +14,8 @@ public class EnemyUnit extends Unit {
   public EnemyUnit(RectangleCollidible hurtBox) {
     super(hurtBox, CollidibleType.EnemyUnit, "Enemy");
     setArriveThroughTree(new CollidibleType[] {});
+    setAttackPower(6);
+    setHealth(300);
   }
 
   @Override
@@ -20,7 +24,7 @@ public class EnemyUnit extends Unit {
   }
 
   @Override
-  protected void updateCurrentDestination(List<Entity> entities, Vector2 mousePos, String mode) {
+  protected void updateCurrentDestination(List<Entity> entities, Vector2 mousePos, ButtonAction mode) {
     entityDestination = getNearestEntityType(entities, CollidibleType.PlayerUnit);
     if (entityDestination != null) {
       setCurrentDestination(entityDestination.getCenter());

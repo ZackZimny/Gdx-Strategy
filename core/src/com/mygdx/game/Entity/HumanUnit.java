@@ -5,5 +5,7 @@ import com.mygdx.game.GameHelpers.RectangleCollidible;
 public class HumanUnit extends PlayerUnit {
   public HumanUnit(RectangleCollidible hurtbox) {
     super(hurtbox, "Human");
+    setHealth(200);
+    setAttackPower(5);
   }
 }

@@ -105,7 +105,19 @@ public class Grid {
     for (int line = 0; line < positions.length - 1; line++) {
       Vector2 start = getIsoCoordinates(positions[line].cpy().add(row, column));
       Vector2 end = getIsoCoordinates(positions[line + 1].cpy().add(row, column));
+      sr.begin(ShapeType.Line);
       sr.line(start, end);
+      sr.end();
+    }
+  }
+
+  public void renderTakenTiles(ShapeRenderer sr, List<Building> buildings) {
+    for (Building building : buildings) {
+      for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+          renderTile(sr, building.getTileX() + x, building.getTileY() + y);
+        }
+      }
     }
   }
 
@@ -118,6 +130,30 @@ public class Grid {
       }
     }
     sr.end();
+  }
+
+  public float getTileWidth() {
+    return tileWidth;
+  }
+
+  public float getTileHeight() {
+    return tileHeight;
+  }
+
+  public float getTileWidthHalf() {
+    return tileWidthHalf;
+  }
+
+  public float getTileHeightHalf() {
+    return tileHeightHalf;
+  }
+
+  public static int getSIZE() {
+    return SIZE;
+  }
+
+  public static int getHALF_SIZE() {
+    return HALF_SIZE;
   }
 
 }

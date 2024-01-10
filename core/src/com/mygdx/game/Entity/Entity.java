@@ -6,13 +6,14 @@ import com.mygdx.game.GameHelpers.Collidible;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.GameState;
 
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 public abstract class Entity {
   private Collidible collidible;
   private CollidibleType collidibleType;
   private int health;
   private int attackPower;
-  private String resourceUsedToMake;
-  private int resourceAmount;
 
   public Entity(Collidible collidible, int health, int attackPower) {
     this.collidible = collidible;
@@ -21,9 +22,11 @@ public abstract class Entity {
     this.attackPower = attackPower;
   }
 
-  public abstract void render(ShapeRenderer sr);
+  public abstract void render(ShapeRenderer sr, SpriteBatch sb);
 
   public abstract void updateState(GameState gameState);
+
+  public abstract void generateAnimations(AssetManager assetManager);
 
   public Vector2 getCenter() {
     return collidible.getCenter();

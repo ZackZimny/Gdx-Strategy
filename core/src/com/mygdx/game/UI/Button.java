@@ -11,11 +11,11 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Button {
   private Rectangle rectangle;
-  private String text;
+  private ButtonAction action;
   private FontHandler fontHandler;
 
-  public Button(String text, Rectangle rectangle, FontHandler fontHandler) {
-    this.text = text;
+  public Button(ButtonAction action, Rectangle rectangle, FontHandler fontHandler) {
+    this.action = action;
     this.rectangle = rectangle;
     this.fontHandler = fontHandler;
   }
@@ -39,6 +39,7 @@ public class Button {
     sr.begin(ShapeType.Filled);
     sr.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
     sr.end();
+    String text = action.toString();
     float width = fontHandler.getTextWidth(text);
     float height = fontHandler.getTextHeight(text);
     sb.begin();
@@ -47,12 +48,16 @@ public class Button {
     sb.end();
   }
 
-  public String getText() {
-    return text;
-  }
-
   public Rectangle getRectangle() {
     return rectangle;
+  }
+
+  public ButtonAction getAction() {
+    return action;
+  }
+
+  public FontHandler getFontHandler() {
+    return fontHandler;
   }
 
 }
