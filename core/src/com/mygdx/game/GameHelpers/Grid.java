@@ -28,6 +28,13 @@ public class Grid {
     tileHeightHalf = tileHeight / 2f;
   }
 
+  public static boolean onScreen(Vector2 position) {
+    float halfHeight = Gdx.graphics.getHeight() / 2f;
+    float halfWidth = Gdx.graphics.getWidth() / 2f;
+    return position.x > -halfWidth && position.x < halfWidth && position.y > -halfHeight
+        && position.y < halfHeight;
+  }
+
   private void drawTile(ShapeRenderer sr, int row, int column) {
 
     Vector2[] positions = {

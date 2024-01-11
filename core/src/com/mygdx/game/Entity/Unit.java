@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.CollisionManager;
 import com.mygdx.game.GameHelpers.GameState;
+import com.mygdx.game.GameHelpers.Grid;
 import com.mygdx.game.GameHelpers.ItemType;
 import com.mygdx.game.GameHelpers.RectangleCollidible;
 import com.mygdx.game.UI.ButtonAction;
@@ -47,10 +48,10 @@ public abstract class Unit extends Entity {
   private float stateTime;
   private boolean stationary = true;
 
-  public Unit(RectangleCollidible rectangleCollidible, CollidibleType collidibleType, String name) {
-    super(rectangleCollidible, 0, 0);
+  public Unit(Vector2 position, CollidibleType collidibleType, String name) {
+    super(new RectangleCollidible(position.x, position.y, 32, 32, collidibleType), 0, 0);
     currentDestination = null;
-    this.rectangleCollidible = rectangleCollidible;
+    this.rectangleCollidible = new RectangleCollidible(position.x, position.y, 32, 32, collidibleType);
     this.name = name;
     arriveThroughTree = new CollidibleType[] { collidibleType };
   }
@@ -130,15 +131,15 @@ public abstract class Unit extends Entity {
     return false;
   }
 
-  protected Entity getNearestEntityType(List<Entity> entities, CollidibleType collidibleType) {
+  protected Entity getNearestEntityType(List<Entity> entities, CollidibleType collidibleType, boolean onScreen) {
     float recordDistance = Float.MAX_VALUE;
     Entity closestEntity = null;
     for (Entity entity : entities) {
       if (entity.getCollidible().equals(getCollidible()) || !entity.getCollidibleType().equals(collidibleType)) {
         continue;
       }
-      float distance = entity.getVertices()[0].dst(getCenter());
-      if (distance < recordDistance) {
+      float distance = entity.getCenter().dst(getCenter());
+      if (distance < recordDistance && (onScreen == false || onScreen == true && Grid.onScreen(entity.getCenter()))) {
         recordDistance = distance;
         closestEntity = entity;
       }
@@ -168,7 +169,8 @@ public abstract class Unit extends Entity {
     float detectionDepth = 70f;
     Collidible collidibleDestination = entityDestination == null ? null : entityDestination.getCollidible();
     Vector2 heading = getHeading(gameState.getCollidibles(), collidibleDestination, detectionDepth);
-    velocity = heading.cpy().scl(gameState.getDeltaTime() * 35f);
+    float speed = 50f;
+    velocity = heading.cpy().scl(gameState.getDeltaTime() * speed);
     boolean arrivedAtDestination = currentDestination != null && currentDestination.epsilonEquals(getCenter(), 3);
     boolean arrivatedAtCollidible = false;
     if (entityDestination != null) {
@@ -212,6 +214,10 @@ public abstract class Unit extends Entity {
         rectangleCollidible.getWidth(),
         rectangleCollidible.getHeight());
     sr.end();
+  }
+
+  public float getRenderOrderValue() {
+    return getCenter().y;
   }
 
   protected void setCurrentDestination(Vector2 currentDestination) {

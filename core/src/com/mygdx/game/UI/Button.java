@@ -13,11 +13,17 @@ public class Button {
   private Rectangle rectangle;
   private ButtonAction action;
   private FontHandler fontHandler;
+  private String description = null;
 
   public Button(ButtonAction action, Rectangle rectangle, FontHandler fontHandler) {
     this.action = action;
     this.rectangle = rectangle;
     this.fontHandler = fontHandler;
+  }
+
+  public Button(ButtonAction action, String description, Rectangle rectangle, FontHandler fontHandler) {
+    this(action, rectangle, fontHandler);
+    this.description = description;
   }
 
   public boolean isHovered(Vector2 mousePos) {
@@ -46,6 +52,12 @@ public class Button {
     fontHandler.getFont().draw(sb, text, rectangle.getX() + rectangle.getWidth() / 2f - width / 2f,
         rectangle.getY() + rectangle.getHeight() / 2f + height / 2f);
     sb.end();
+    if (description != null) {
+      sb.begin();
+      fontHandler.getSmallFont().draw(sb, description, rectangle.getX(),
+          rectangle.getY() + rectangle.getHeight() / 2f - height - 5);
+      sb.end();
+    }
   }
 
   public Rectangle getRectangle() {
@@ -58,6 +70,10 @@ public class Button {
 
   public FontHandler getFontHandler() {
     return fontHandler;
+  }
+
+  protected void setDescription(String description) {
+    this.description = description;
   }
 
 }

@@ -9,6 +9,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.Entity.Apartment;
+import com.mygdx.game.Entity.Building;
+import com.mygdx.game.Entity.Factory;
+import com.mygdx.game.Entity.Generator;
+import com.mygdx.game.Entity.Mine;
+import com.mygdx.game.GameHelpers.Grid;
 
 public class ButtonGroup {
   private Button[] currentButtons;
@@ -18,6 +24,13 @@ public class ButtonGroup {
       ButtonAction.Build };
   private ButtonAction[] buildActions = new ButtonAction[] { ButtonAction.Apartment, ButtonAction.Generator,
       ButtonAction.Mine, ButtonAction.Factory };
+  private Grid dummyGrid = new Grid(1, 1);
+  private Building[] dummyBuildings = new Building[] {
+      new Apartment(dummyGrid, 0, 0),
+      new Generator(dummyGrid, 0, 0),
+      new Mine(dummyGrid, 0, 0),
+      new Factory(dummyGrid, 0, 0)
+  };
   private Button[] defaultButtons = new Button[defaultActions.length];
   private Button[] buildButtons = new Button[buildActions.length];
 
@@ -27,26 +40,37 @@ public class ButtonGroup {
   }
 
   public void calculateButtons() {
-    float buttonPadding = Gdx.graphics.getHeight() * 0.15f;
+    float buttonPadding = Gdx.graphics.getHeight() * 0.2f;
     float padding = Gdx.graphics.getHeight() * 0.05f;
-    float sideLength = Gdx.graphics.getHeight() * 0.1f;
+    float sideLength = Gdx.graphics.getHeight() * 0.15f;
     for (int i = 0; i < defaultActions.length; i++) {
-      defaultButtons[i] = createButton(defaultActions[i], i, buttonPadding, padding, sideLength);
+      defaultButtons[i] = createButton(defaultActions[i], generateRectangle(i, buttonPadding, padding, sideLength));
     }
     for (int i = 0; i < buildActions.length; i++) {
-      buildButtons[i] = createButton(buildActions[i], i, buttonPadding, padding, sideLength);
+      buildButtons[i] = createBuildingButton(dummyBuildings[i], buildActions[i],
+          generateRectangle(i, buttonPadding, padding, sideLength));
     }
   }
 
-  public Button createButton(ButtonAction action, int index, float buttonPadding, float padding, float sideLength) {
-    return new Button(action,
-        new Rectangle(Gdx.graphics.getWidth() / 2f - sideLength - padding - index * buttonPadding,
-            -Gdx.graphics.getHeight() / 2f + padding,
-            sideLength, sideLength),
-        fontHandler);
+  private Rectangle generateRectangle(int index, float buttonPadding, float padding, float sideLength) {
+    return new Rectangle(Gdx.graphics.getWidth() / 2f - sideLength - padding - index * buttonPadding,
+        -Gdx.graphics.getHeight() / 2f + padding,
+        sideLength, sideLength);
+  }
+
+  public Button createButton(ButtonAction action, Rectangle rectangle) {
+    return new Button(action, rectangle, fontHandler);
+  }
+
+  public Button createBuildingButton(Building building, ButtonAction action, Rectangle rectangle) {
+    return new BuildingButton(building, action, rectangle, fontHandler);
   }
 
   public void render(SpriteBatch spriteBatch, ShapeRenderer sr, Vector2 mousePos) {
+    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+      currentButtons = defaultButtons;
+      currentAction = ButtonAction.Move;
+    }
     for (Button button : currentButtons) {
       boolean buildModeStarted = button.getAction().equals(ButtonAction.Build) && button.isClicked(mousePos);
       boolean buildingPlaced = isInBuildMode() && Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT);

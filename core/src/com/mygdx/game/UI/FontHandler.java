@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
  */
 public class FontHandler {
   private final BitmapFont font;
+  private final BitmapFont smallFont;
   private final FreeTypeFontGenerator fontGenerator;
   private final FreeTypeFontGenerator.FreeTypeFontParameter parameter;
   private final GlyphLayout layout = new GlyphLayout();
@@ -21,9 +22,11 @@ public class FontHandler {
   public FontHandler() {
     fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("FFFFORWA.TTF"));
     parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-    parameter.size = 20;
+    parameter.size = 15;
     parameter.color = Color.BLACK;
     font = fontGenerator.generateFont(parameter);
+    parameter.size = 10;
+    smallFont = fontGenerator.generateFont(parameter);
   }
 
   public FontHandler(int size, Color color) {
@@ -32,6 +35,8 @@ public class FontHandler {
     parameter.size = size;
     parameter.color = color;
     font = fontGenerator.generateFont(parameter);
+    parameter.size = size * 2 / 3;
+    smallFont = fontGenerator.generateFont(parameter);
   }
 
   /**
@@ -58,5 +63,9 @@ public class FontHandler {
 
   public BitmapFont getFont() {
     return font;
+  }
+
+  public BitmapFont getSmallFont() {
+    return smallFont;
   }
 }

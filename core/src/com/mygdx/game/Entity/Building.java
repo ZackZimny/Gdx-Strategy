@@ -1,7 +1,9 @@
 package com.mygdx.game.Entity;
 
 import java.util.HashMap;
+import java.util.List;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,21 +16,19 @@ import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.CollisionManager;
 import com.mygdx.game.GameHelpers.GameState;
 import com.mygdx.game.GameHelpers.Grid;
-import com.mygdx.game.GameHelpers.ItemHandler;
+import com.mygdx.game.GameHelpers.ItemLoad;
 import com.mygdx.game.GameHelpers.ItemType;
 
-public class Building extends Entity {
+public abstract class Building extends Entity {
   private Grid grid;
   private int tileX;
   private int tileY;
   private Texture texture;
   private String name;
-  private HashMap<ItemType, Integer> resourcesRequiredToBuild;
-  private HashMap<ItemType, Integer> resourcesCreatedPerMinute;
-  private HashMap<Class<? extends PlayerUnit>, Integer> unitsCreatedPerMinute;
   private float resourceTimer = 0f;
   private float unitTimer = 0f;
   private boolean unitIsCreatable = false;
+  private HashMap<ItemType, Integer> resourcesRequiredToBuild;
 
   public Building(Grid grid, int tileX, int tileY, String name) {
     super(new Collidible(grid.getVertices(tileX, tileY), CollidibleType.Building), 1000, 0);
@@ -38,7 +38,37 @@ public class Building extends Entity {
     this.name = name;
     setHealth(1000);
     setAttackPower(0);
-    HashMap<ItemType, Integer> resourcesRequiredToBuild = new HashMap<>();
+    resourcesRequiredToBuild = new HashMap<>();
+    resourcesRequiredToBuild.put(ItemType.Steel, 50);
+  }
+
+  protected Vector2 generateRandomPosition(List<Collidible> collidibles) {
+    float degrees = (float) Math.random() * 360;
+    float radius = 64;
+    Vector2 position = getCenter().cpy().add(new Vector2(radius, 0).rotateDeg(degrees));
+    boolean invalidSpawn = !isValidSpawn(collidibles, position);
+    while (invalidSpawn) {
+      radius += 10;
+      invalidSpawn = !isValidSpawn(collidibles, position);
+    }
+    return position;
+  }
+
+  private boolean isValidSpawn(List<Collidible> collidibles, Vector2 position) {
+    return collidibles.stream()
+        .anyMatch((c) -> c.pointCollide(position) || Grid.onScreen(position));
+  }
+
+  public abstract PlayerUnit createUnits(AssetManager assetManager, List<Collidible> collidibles);
+
+  public abstract ItemLoad createResources();
+
+  public String getDescription() {
+    String itemString = "Resources: ";
+    for (ItemType item : resourcesRequiredToBuild.keySet()) {
+      itemString += item.toString() + ": " + resourcesRequiredToBuild.get(item) + "\n";
+    }
+    return itemString;
   }
 
   public void render(ShapeRenderer sr, SpriteBatch sb) {
@@ -70,9 +100,6 @@ public class Building extends Entity {
   public void updateState(GameState gameState) {
     resourceTimer += gameState.getDeltaTime();
     unitTimer += gameState.getDeltaTime();
-    ItemHandler itemHandler = gameState.getItemHandler();
-    unitIsCreatable = resourcesPerUnit.keySet().stream()
-        .allMatch((r) -> itemHandler.getItemCount(r) > resourcesPerUnit.get(r));
   }
 
   public boolean rectangleCollide(Rectangle rectangle) {
@@ -96,6 +123,10 @@ public class Building extends Entity {
     return shape.contains(point);
   }
 
+  public float getRenderOrderValue() {
+    return (float) (getCenter().y + grid.getTileHeight() * 2);
+  }
+
   public CollidibleType getCollidibleType() {
     return CollidibleType.Building;
   }
@@ -112,47 +143,31 @@ public class Building extends Entity {
     return name;
   }
 
-  public HashMap<ItemType, Integer> getResourcesRequiredToBuild() {
-    return resourcesRequiredToBuild;
-  }
-
-  public HashMap<ItemType, Integer> getResourcesCreatedPerMinute() {
-    return resourcesCreatedPerMinute;
-  }
-
-  public HashMap<ItemType, Integer> getResourcesPerUnit() {
-    return resourcesPerUnit;
-  }
-
   public float getResourceTimer() {
     return resourceTimer;
+  }
+
+  protected void setResourceTimer(float resourceTimer) {
+    this.resourceTimer = resourceTimer;
   }
 
   public float getUnitTimer() {
     return unitTimer;
   }
 
+  protected void setUnitTimer(float unitTimer) {
+    this.unitTimer = unitTimer;
+  }
+
   public boolean unitIsCreatable() {
     return unitIsCreatable;
   }
 
-  protected void setResourcesRequiredToBuild(HashMap<ItemType, Integer> resourcesRequiredToBuild) {
+  public void setResourcesRequiredToBuild(HashMap<ItemType, Integer> resourcesRequiredToBuild) {
     this.resourcesRequiredToBuild = resourcesRequiredToBuild;
   }
 
-  protected void setResourcesCreatedPerMinute(HashMap<ItemType, Integer> resourcesCreatedPerMinute) {
-    this.resourcesCreatedPerMinute = resourcesCreatedPerMinute;
-  }
-
-  protected void setResourcesPerUnit(HashMap<ItemType, Integer> resourcesPerUnit) {
-    this.resourcesPerUnit = resourcesPerUnit;
-  }
-
-  public HashMap<Class<? extends PlayerUnit>, Integer> getUnitsCreatedPerMinute() {
-    return unitsCreatedPerMinute;
-  }
-
-  protected void setUnitsCreatedPerMinute(HashMap<Class<? extends PlayerUnit>, Integer> unitsCreatedPerMinute) {
-    this.unitsCreatedPerMinute = unitsCreatedPerMinute;
+  public HashMap<ItemType, Integer> getResourcesRequiredToBuild() {
+    return resourcesRequiredToBuild;
   }
 }

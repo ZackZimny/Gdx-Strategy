@@ -28,6 +28,8 @@ public abstract class Entity {
 
   public abstract void generateAnimations(AssetManager assetManager);
 
+  public abstract float getRenderOrderValue();
+
   public Vector2 getCenter() {
     return collidible.getCenter();
   }

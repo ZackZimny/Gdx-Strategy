@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.GameState;
-import com.mygdx.game.GameHelpers.RectangleCollidible;
 import com.mygdx.game.GameHelpers.Selector;
 import com.mygdx.game.UI.ButtonAction;
 
@@ -18,8 +17,8 @@ public class PlayerUnit extends Unit {
   private boolean isClicked = false;
   private Entity entityDestination = null;
 
-  public PlayerUnit(RectangleCollidible hurtbox, String name) {
-    super(hurtbox, CollidibleType.PlayerUnit, name);
+  public PlayerUnit(Vector2 position, String name) {
+    super(position, CollidibleType.PlayerUnit, name);
     setCurrentDestination(null);
   }
 
@@ -62,7 +61,7 @@ public class PlayerUnit extends Unit {
       setCurrentDestination(mousePos);
       entityDestination = super.getEntityDestination(entities);
     } else if (mode.equals(ButtonAction.Fight) && isSelected()) {
-      Entity nearestEnemy = getNearestEntityType(entities, CollidibleType.EnemyUnit);
+      Entity nearestEnemy = getNearestEntityType(entities, CollidibleType.EnemyUnit, true);
       if (nearestEnemy != null) {
         setCurrentDestination(nearestEnemy.getCenter());
         entityDestination = nearestEnemy;

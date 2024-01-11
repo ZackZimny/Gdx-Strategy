@@ -1,7 +1,5 @@
 package com.mygdx.game;
 
-import java.io.IOException;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
