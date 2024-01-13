@@ -44,7 +44,7 @@ public class ButtonGroup {
   public void calculateButtons() {
     float buttonPadding = Gdx.graphics.getHeight() * 0.2f;
     float padding = Gdx.graphics.getHeight() * 0.05f;
-    float sideLength = Gdx.graphics.getHeight() * 0.15f;
+    float sideLength = fontHandler.getFont().getLineHeight() * 6.5f;
     for (int i = 0; i < defaultActions.length; i++) {
       defaultButtons[i] = createButton(defaultActions[i], generateRectangle(i, buttonPadding, padding, sideLength));
     }

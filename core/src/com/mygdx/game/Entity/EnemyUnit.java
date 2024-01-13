@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
+import com.mygdx.game.GameHelpers.RuntimeConfigurations;
 import com.mygdx.game.UI.ButtonAction;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public class EnemyUnit extends Unit {
   protected void updateHealth(List<Unit> units, float deltaTime) {
     updateHealthOnCollisionWithUnitType(units, CollidibleType.PlayerUnit);
     if (getHealth() <= 0) {
-      explosionSound.play();
+      explosionSound.play(RuntimeConfigurations.getSfxVolumePercent());
     }
   }
 }

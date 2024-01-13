@@ -1,5 +1,7 @@
 package com.mygdx.game;
 
+import javax.xml.crypto.Data;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -11,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.AssetManagerHandler;
+import com.mygdx.game.GameHelpers.DatabaseManager;
 import com.mygdx.game.UI.ScreenManager;
 
 public class Game extends ApplicationAdapter {

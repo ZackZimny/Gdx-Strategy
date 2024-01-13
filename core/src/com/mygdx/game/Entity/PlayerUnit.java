@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.GameLoop;
+import com.mygdx.game.GameHelpers.RuntimeConfigurations;
 import com.mygdx.game.GameHelpers.Selector;
 import com.mygdx.game.UI.ButtonAction;
 
@@ -82,7 +83,7 @@ public class PlayerUnit extends Unit {
     int prevHealth = getHealth();
     updateHealthOnCollisionWithUnitType(units, CollidibleType.EnemyUnit);
     if (getHealth() != prevHealth && hitSoundTimer >= 1) {
-      getHitSound().play();
+      getHitSound().play(RuntimeConfigurations.getSfxVolumePercent());
       hitSoundTimer = 0;
       return;
     }

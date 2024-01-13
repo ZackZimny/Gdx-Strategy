@@ -7,6 +7,7 @@ public class MainMenuScreen extends Screen {
     super("Verne", ScreenState.MAIN_MENU);
     LinkedHashMap<String, ScreenState> stringStateHashMap = new LinkedHashMap<>();
     stringStateHashMap.put("Play", ScreenState.GAME_LOOP);
+    stringStateHashMap.put("Options", ScreenState.OPTIONS);
     stringStateHashMap.put("Exit", ScreenState.EXIT);
     createButtonColumn(stringStateHashMap);
   }

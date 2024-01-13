@@ -2,8 +2,11 @@ package com.mygdx.game.UI;
 
 import java.util.HashMap;
 
+import javax.xml.crypto.Data;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -13,7 +16,9 @@ import com.badlogic.gdx.graphics.g3d.particles.ParticleShader.Inputs;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.game.GameHelpers.DatabaseManager;
 import com.mygdx.game.GameHelpers.GameLoop;
+import com.mygdx.game.GameHelpers.RuntimeConfigurations;
 
 public class ScreenManager {
   private GameLoop gameLoop;
@@ -25,6 +30,7 @@ public class ScreenManager {
   private Screen currentScreen;
   private MainMenuScreen mainMenuScreen = new MainMenuScreen();
   private ExitScreen exitScreen = new ExitScreen();
+  private OptionsScreen optionsScreen;
   private Music calmMusic;
   private Music fightMusic;
 
@@ -42,6 +48,14 @@ public class ScreenManager {
     calmMusic.setLooping(true);
     fightMusic = assetManager.get("Fight.mp3", Music.class);
     fightMusic.setLooping(true);
+    DatabaseManager.createDatabase();
+    DatabaseManager.createTables();
+    DatabaseManager.getRuntimeConfigurations();
+    optionsScreen = new OptionsScreen();
+    optionsScreen.loadSounds(assetManager);
+    screenHashMap.put(ScreenState.OPTIONS, optionsScreen);
+    calmMusic.setVolume(RuntimeConfigurations.getMusicVolumePercent());
+    fightMusic.setVolume(RuntimeConfigurations.getMusicVolumePercent());
   }
 
   /**
@@ -78,6 +92,10 @@ public class ScreenManager {
         currentScreen = gameOverScreen;
       }
     } else {
+      if (screenState == ScreenState.OPTIONS) {
+        calmMusic.setVolume(RuntimeConfigurations.getMusicVolumePercent());
+        fightMusic.setVolume(RuntimeConfigurations.getMusicVolume());
+      }
       fightMusic.stop();
       calmMusic.play();
       screenState = currentScreen.getScreenState(mousePos);
