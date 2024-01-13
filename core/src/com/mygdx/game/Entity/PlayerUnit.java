@@ -5,7 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
-import com.mygdx.game.GameHelpers.GameState;
+import com.mygdx.game.GameHelpers.GameLoop;
 import com.mygdx.game.GameHelpers.Selector;
 import com.mygdx.game.UI.ButtonAction;
 
@@ -16,6 +16,7 @@ public class PlayerUnit extends Unit {
   private boolean isSelected = false;
   private boolean isClicked = false;
   private Entity entityDestination = null;
+  private float hitSoundTimer = 0f;
 
   public PlayerUnit(Vector2 position, String name) {
     super(position, CollidibleType.PlayerUnit, name);
@@ -45,7 +46,7 @@ public class PlayerUnit extends Unit {
   }
 
   @Override
-  public void updateState(GameState gameState) {
+  public void updateState(GameLoop gameState) {
     handleSelection(gameState.getSelector(), gameState.getMousePos());
     super.updateState(gameState);
   }
@@ -77,8 +78,15 @@ public class PlayerUnit extends Unit {
     return super.getEntityDestination(entities);
   }
 
-  protected void updateHealth(List<Unit> units) {
+  protected void updateHealth(List<Unit> units, float deltaTime) {
+    int prevHealth = getHealth();
     updateHealthOnCollisionWithUnitType(units, CollidibleType.EnemyUnit);
+    if (getHealth() != prevHealth && hitSoundTimer >= 1) {
+      getHitSound().play();
+      hitSoundTimer = 0;
+      return;
+    }
+    hitSoundTimer += deltaTime;
   }
 
   public boolean isBounded(Selector selector) {

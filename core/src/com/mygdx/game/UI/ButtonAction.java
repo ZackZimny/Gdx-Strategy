@@ -7,5 +7,8 @@ public enum ButtonAction {
   Mine,
   Apartment,
   Factory,
-  Generator
+  Generator,
+  Play_Game,
+  Tutorial,
+  Settings
 }

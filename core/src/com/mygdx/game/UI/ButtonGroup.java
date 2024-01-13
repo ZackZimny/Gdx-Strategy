@@ -1,5 +1,6 @@
 package com.mygdx.game.UI;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.badlogic.gdx.Gdx;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.mygdx.game.Entity.Apartment;
 import com.mygdx.game.Entity.Building;
 import com.mygdx.game.Entity.Factory;
@@ -17,7 +19,7 @@ import com.mygdx.game.Entity.Mine;
 import com.mygdx.game.GameHelpers.Grid;
 
 public class ButtonGroup {
-  private Button[] currentButtons;
+  private GameButton[] currentButtons;
   private ButtonAction currentAction = ButtonAction.Move;
   private FontHandler fontHandler = new FontHandler(15, Color.BLACK);
   private ButtonAction[] defaultActions = new ButtonAction[] { ButtonAction.Move, ButtonAction.Fight,
@@ -31,8 +33,8 @@ public class ButtonGroup {
       new Mine(dummyGrid, 0, 0),
       new Factory(dummyGrid, 0, 0)
   };
-  private Button[] defaultButtons = new Button[defaultActions.length];
-  private Button[] buildButtons = new Button[buildActions.length];
+  private GameButton[] defaultButtons = new GameButton[defaultActions.length];
+  private GameButton[] buildButtons = new GameButton[buildActions.length];
 
   public ButtonGroup() {
     calculateButtons();
@@ -58,11 +60,11 @@ public class ButtonGroup {
         sideLength, sideLength);
   }
 
-  public Button createButton(ButtonAction action, Rectangle rectangle) {
-    return new Button(action, rectangle, fontHandler);
+  public GameButton createButton(ButtonAction action, Rectangle rectangle) {
+    return new GameButton(action, rectangle, fontHandler);
   }
 
-  public Button createBuildingButton(Building building, ButtonAction action, Rectangle rectangle) {
+  public GameButton createBuildingButton(Building building, ButtonAction action, Rectangle rectangle) {
     return new BuildingButton(building, action, rectangle, fontHandler);
   }
 
@@ -71,7 +73,7 @@ public class ButtonGroup {
       currentButtons = defaultButtons;
       currentAction = ButtonAction.Move;
     }
-    for (Button button : currentButtons) {
+    for (GameButton button : currentButtons) {
       boolean buildModeStarted = button.getAction().equals(ButtonAction.Build) && button.isClicked(mousePos);
       boolean buildingPlaced = isInBuildMode() && Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT);
       if (buildModeStarted) {
@@ -91,13 +93,13 @@ public class ButtonGroup {
     spriteBatch.begin();
     fontHandler.getFont().draw(spriteBatch, text, textX, textY);
     spriteBatch.end();
-    for (Button button : currentButtons) {
+    for (GameButton button : currentButtons) {
       button.render(spriteBatch, sr, mousePos);
     }
   }
 
   public ButtonAction getCurrentAction(Vector2 mousePos) {
-    for (Button button : currentButtons) {
+    for (GameButton button : currentButtons) {
       if (button.isClicked(mousePos)) {
         currentAction = button.getAction();
         return currentAction;
@@ -108,5 +110,12 @@ public class ButtonGroup {
 
   public boolean isInBuildMode() {
     return Arrays.asList(buildActions).contains(currentAction);
+  }
+
+  public ArrayList<GameButton> getButtons() {
+    ArrayList<GameButton> buttons = new ArrayList<>();
+    buttons.addAll(Arrays.asList(defaultButtons));
+    buttons.addAll(Arrays.asList(buildButtons));
+    return buttons;
   }
 }

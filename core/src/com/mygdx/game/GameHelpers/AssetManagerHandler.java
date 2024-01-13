@@ -1,6 +1,8 @@
 package com.mygdx.game.GameHelpers;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 
 public class AssetManagerHandler {
@@ -22,6 +24,10 @@ public class AssetManagerHandler {
     assetManager.load("Generator.png", Texture.class);
     assetManager.load("Mine.png", Texture.class);
     assetManager.load("Factory.png", Texture.class);
+    assetManager.load("Calm.mp3", Music.class);
+    assetManager.load("Fight.mp3", Music.class);
+    assetManager.load("Hit.wav", Sound.class);
+    assetManager.load("Explosion.wav", Sound.class);
   }
 
   public AssetManager getAssetManager() {

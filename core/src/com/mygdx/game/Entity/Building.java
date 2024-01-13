@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.Collidible;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.CollisionManager;
-import com.mygdx.game.GameHelpers.GameState;
+import com.mygdx.game.GameHelpers.GameLoop;
 import com.mygdx.game.GameHelpers.Grid;
 import com.mygdx.game.GameHelpers.ItemLoad;
 import com.mygdx.game.GameHelpers.ItemType;
@@ -97,7 +97,7 @@ public abstract class Building extends Entity {
     return getCollidible().lineCollide(start, end);
   }
 
-  public void updateState(GameState gameState) {
+  public void updateState(GameLoop gameState) {
     resourceTimer += gameState.getDeltaTime();
     unitTimer += gameState.getDeltaTime();
   }

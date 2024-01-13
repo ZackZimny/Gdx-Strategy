@@ -7,26 +7,22 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Rectangle;
-import java.math.*;
 
 public class Selector {
   private Vector2 prevVector;
-  private boolean selecting = false;
   private Rectangle bound;
 
   public void render(ShapeRenderer sr, Vector2 mousePos) {
     if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
       prevVector = mousePos;
-      selecting = true;
     }
 
     if (!Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-      selecting = false;
       prevVector = null;
       bound = null;
     }
 
-    if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+    if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && prevVector != null) {
       float x = prevVector.x;
       float y = prevVector.y;
       float width = mousePos.x - prevVector.x;

@@ -2,7 +2,6 @@ package com.mygdx.game.Entity;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.mygdx.game.GameHelpers.Collidible;
-import com.mygdx.game.GameHelpers.GameState;
 import com.mygdx.game.GameHelpers.Grid;
 import com.mygdx.game.GameHelpers.ItemLoad;
 import com.mygdx.game.GameHelpers.ItemType;

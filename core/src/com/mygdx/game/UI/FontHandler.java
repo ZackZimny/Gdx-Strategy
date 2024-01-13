@@ -48,7 +48,7 @@ public class FontHandler {
    */
   public float centerX(String text, float screenWidth) {
     layout.setText(font, text);
-    return screenWidth / 2 - layout.width / 2;
+    return -layout.width / 2;
   }
 
   public float getTextHeight(String text) {

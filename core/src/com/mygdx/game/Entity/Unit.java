@@ -1,8 +1,7 @@
 package com.mygdx.game.Entity;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -10,15 +9,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.game.GameHelpers.CollidibleType;
 import com.mygdx.game.GameHelpers.CollisionManager;
-import com.mygdx.game.GameHelpers.GameState;
+import com.mygdx.game.GameHelpers.GameLoop;
 import com.mygdx.game.GameHelpers.Grid;
-import com.mygdx.game.GameHelpers.ItemType;
 import com.mygdx.game.GameHelpers.RectangleCollidible;
 import com.mygdx.game.UI.ButtonAction;
 import com.mygdx.game.GameHelpers.Collidible;
@@ -42,11 +37,11 @@ public abstract class Unit extends Entity {
   private CollidibleType[] arriveThroughTree;
   private RectangleCollidible rectangleCollidible;
   private Vector2 velocity = new Vector2(0, 0);
-  private HashMap<ItemType, Integer> resourcesUsedToRun = new HashMap<>();
   private HashMap<Direction, Animation<TextureRegion>> animationMap = new HashMap<>();
   private String name;
   private float stateTime;
   private boolean stationary = true;
+  private Sound hitSound;
 
   public Unit(Vector2 position, CollidibleType collidibleType, String name) {
     super(new RectangleCollidible(position.x, position.y, 32, 32, collidibleType), 0, 0);
@@ -65,9 +60,10 @@ public abstract class Unit extends Entity {
       Animation<TextureRegion> animation = new Animation<>(1 / 4f, regions[0]);
       animationMap.put(direction, animation);
     }
+    hitSound = assetManager.get("Hit.wav", Sound.class);
   }
 
-  protected abstract void updateHealth(List<Unit> units);
+  protected abstract void updateHealth(List<Unit> units, float deltaTime);
 
   public Vector2 getHeading(List<Collidible> collidibles, Collidible collidibleDestination, float depth) {
     Vector2 detection = currentDestination != null ? currentDestination.cpy().sub(getCenter()).nor().scl(depth)
@@ -158,8 +154,8 @@ public abstract class Unit extends Entity {
   }
 
   @Override
-  public void updateState(GameState gameState) {
-    updateHealth(gameState.getEntitiesByType(Unit.class));
+  public void updateState(GameLoop gameState) {
+    updateHealth(gameState.getEntitiesByType(Unit.class), gameState.getDeltaTime());
     updateCurrentDestination(gameState.getEntities(), gameState.getMousePos(), gameState.getButtonAction());
     if (currentDestination == null) {
       return;
@@ -230,5 +226,9 @@ public abstract class Unit extends Entity {
 
   protected void setArriveThroughTree(CollidibleType[] arriveThroughTree) {
     this.arriveThroughTree = arriveThroughTree;
+  }
+
+  protected Sound getHitSound() {
+    return hitSound;
   }
 }

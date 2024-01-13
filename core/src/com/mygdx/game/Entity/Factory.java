@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.mygdx.game.GameHelpers.Collidible;
-import com.mygdx.game.GameHelpers.GameState;
+import com.mygdx.game.GameHelpers.GameLoop;
 import com.mygdx.game.GameHelpers.Grid;
 import com.mygdx.game.GameHelpers.ItemLoad;
 import com.mygdx.game.GameHelpers.ItemType;

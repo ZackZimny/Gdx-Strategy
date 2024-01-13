@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.Collidible;
 import com.mygdx.game.GameHelpers.CollidibleType;
-import com.mygdx.game.GameHelpers.GameState;
+import com.mygdx.game.GameHelpers.GameLoop;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -24,7 +24,7 @@ public abstract class Entity {
 
   public abstract void render(ShapeRenderer sr, SpriteBatch sb);
 
-  public abstract void updateState(GameState gameState);
+  public abstract void updateState(GameLoop gameState);
 
   public abstract void generateAnimations(AssetManager assetManager);
 
