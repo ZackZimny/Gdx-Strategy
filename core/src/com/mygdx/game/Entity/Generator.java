@@ -9,7 +9,7 @@ import com.mygdx.game.GameHelpers.ItemLoad;
 import com.mygdx.game.GameHelpers.ItemType;
 
 public class Generator extends Building {
-  private int productionTime = 5;
+  private int productionTime = 3;
 
   public Generator(Grid grid, int tileX, int tileY) {
     super(grid, tileX, tileY, "Generator");

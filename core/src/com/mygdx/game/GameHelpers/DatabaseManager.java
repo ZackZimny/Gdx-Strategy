@@ -67,15 +67,103 @@ public class DatabaseManager {
       runSql(sql);
       EventLogHandler.log("runtime_configurations table has been properly loaded.");
       if (tableIsEmpty("runtime_configurations")) {
-        System.out.println("Table is empty");
         sql = "INSERT INTO runtime_configurations(musicVolume, sfxVolume, fullscreen) " +
             "VALUES (5, 5, 0)";
         runSql(sql);
         EventLogHandler.log("Default runtime_configurations have been added.");
       }
+      sql = "CREATE TABLE IF NOT EXISTS records(record TEXT NOT NULL, count INTEGER NOT NULL)";
+      runSql(sql);
+      if (tableIsEmpty("records")) {
+        sql = "INSERT INTO records(record, count) VALUES ";
+        for (String record : Records.getRecordsStrings()) {
+          sql += String.format("('%s', 0),", record);
+        }
+        // removes the final comma from the sql
+        sql = sql.substring(0, sql.length() - 1);
+        System.out.println(sql);
+        runSql(sql);
+      }
     } catch (SQLException e) {
       CrashLogHandler.logSevere("There has been an issue creating tables in the database. ", e.getMessage());
     }
+  }
+
+  public static int getTopScore() {
+    try {
+      String sql = "SELECT * FROM records WHERE record LIKE 'Top Score'";
+      Connection connection = connect();
+      Statement statement = connection.createStatement();
+      ResultSet resultSet = statement.executeQuery(sql);
+      return resultSet.getInt(1);
+    } catch (SQLException e) {
+      CrashLogHandler.logSevere("There has been an issue getting the player's high score.", e.getMessage());
+    }
+    return -1;
+  }
+
+  public static void updateRecords(Records records) {
+    try {
+      Records previousRecords = DatabaseManager.getRecords();
+      records.getRecordsMap().put("Games Played", previousRecords.getRecordsMap().get("Games Played") + 1);
+      for (String record : Records.getRecordsStrings()) {
+        if (!record.equals("Top Score")) {
+          int previousCount = previousRecords.getRecordsMap().get(record);
+          int currentCount = records.getRecordsMap().get(record);
+          records.getRecordsMap().put(record, previousCount + currentCount);
+        }
+      }
+      boolean recordBeaten = records.getRecordsMap().get("Top Score") > previousRecords.getRecordsMap()
+          .get("Top Score");
+      for (String record : Records.getRecordsStrings()) {
+        if (record.equals("Top Score")) {
+          if (recordBeaten) {
+            String sql = String.format("UPDATE records SET count = %d WHERE record = '%s'",
+                records.getRecordsMap().get(record), record);
+            runSql(sql);
+          }
+          continue;
+        }
+        String sql = String.format("UPDATE records SET count = %d WHERE record = '%s'",
+            records.getRecordsMap().get(record), record);
+        runSql(sql);
+      }
+    } catch (SQLException e) {
+      CrashLogHandler.logSevere("There has been an issue updating records.", e.getMessage());
+    }
+  }
+
+  public static String getRecordString() {
+    String result = "";
+    try {
+      String sql = "SELECT * FROM records";
+      Connection connection = connect();
+      Statement statement = connection.createStatement();
+      ResultSet resultSet = statement.executeQuery(sql);
+      while (resultSet.next()) {
+        result += resultSet.getString(1) + ": " + resultSet.getInt(2) + "\n";
+      }
+      connection.close();
+    } catch (SQLException e) {
+      CrashLogHandler.logSevere("There has been an issue gathering records.", e.getMessage());
+    }
+    return result;
+  }
+
+  public static Records getRecords() {
+    Records result = new Records();
+    try {
+      String sql = "SELECT * FROM records";
+      Connection connection = connect();
+      Statement statement = connection.createStatement();
+      ResultSet resultSet = statement.executeQuery(sql);
+      while (resultSet.next()) {
+        result.addRecord(resultSet.getString(1), resultSet.getInt(2));
+      }
+    } catch (SQLException e) {
+      CrashLogHandler.logSevere("There has been an issue gathering a records object", e.getMessage());
+    }
+    return result;
   }
 
   /**

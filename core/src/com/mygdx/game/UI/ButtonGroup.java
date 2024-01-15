@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.mygdx.game.Entity.Apartment;
 import com.mygdx.game.Entity.Building;
 import com.mygdx.game.Entity.Factory;
@@ -42,9 +41,9 @@ public class ButtonGroup {
   }
 
   public void calculateButtons() {
-    float buttonPadding = Gdx.graphics.getHeight() * 0.2f;
+    float buttonPadding = Gdx.graphics.getHeight() * 0.3f;
     float padding = Gdx.graphics.getHeight() * 0.05f;
-    float sideLength = fontHandler.getFont().getLineHeight() * 6.5f;
+    float sideLength = fontHandler.getFont().getLineHeight() * 7f;
     for (int i = 0; i < defaultActions.length; i++) {
       defaultButtons[i] = createButton(defaultActions[i], generateRectangle(i, buttonPadding, padding, sideLength));
     }

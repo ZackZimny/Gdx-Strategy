@@ -113,6 +113,7 @@ public class Grid {
       Vector2 start = getIsoCoordinates(positions[line].cpy().add(row, column));
       Vector2 end = getIsoCoordinates(positions[line + 1].cpy().add(row, column));
       sr.begin(ShapeType.Line);
+      sr.setColor(Color.BLUE);
       sr.line(start, end);
       sr.end();
     }

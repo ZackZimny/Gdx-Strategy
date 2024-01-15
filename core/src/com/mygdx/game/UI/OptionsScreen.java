@@ -20,6 +20,8 @@ public class OptionsScreen extends Screen {
   private NumberSelect soundEffectsSelect;
   private NumberSelect musicSelect;
   private Sound explosionSound;
+  private float leftPadding = 30;
+  private float topPadding = 200;
 
   /**
    * Initializes options screen
@@ -32,8 +34,6 @@ public class OptionsScreen extends Screen {
     stateScreenMap.put("Apply", ScreenState.OPTIONS);
     stateScreenMap.put("Return to Main Menu", ScreenState.MAIN_MENU);
     createButtonColumn(stateScreenMap);
-    float leftPadding = 30;
-    float topPadding = 200;
     float startY = Gdx.graphics.getHeight() / 2f - topPadding;
     float startX = -Gdx.graphics.getWidth() / 2f + leftPadding;
     fullScreenCheckBox = new Checkbox(new Vector2(startX, startY), "Fullscreen");
@@ -41,6 +41,16 @@ public class OptionsScreen extends Screen {
     musicSelect = new NumberSelect("Music Volume", new Vector2(startX, startY - 120));
     syncWithRuntimeConfigurations();
     determineFullscreen();
+  }
+
+  @Override
+  public void handleResize() {
+    float startY = Gdx.graphics.getHeight() / 2f - topPadding;
+    float startX = -Gdx.graphics.getWidth() / 2f + leftPadding;
+    fullScreenCheckBox.setPosition(new Vector2(startX, startY));
+    soundEffectsSelect.setPosition(new Vector2(startX, startY - 60));
+    musicSelect.setPosition(new Vector2(startX, startY - 120));
+    super.handleResize();
   }
 
   /**

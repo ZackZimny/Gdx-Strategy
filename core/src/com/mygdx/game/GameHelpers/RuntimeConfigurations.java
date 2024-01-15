@@ -14,7 +14,7 @@ public class RuntimeConfigurations {
   }
 
   public static float getSfxVolumePercent() {
-    return RuntimeConfigurations.sfxVolume / 10f;
+    return RuntimeConfigurations.sfxVolume / 10f * 0.8f;
   }
 
   public static int getMusicVolume() {
@@ -22,7 +22,7 @@ public class RuntimeConfigurations {
   }
 
   public static float getMusicVolumePercent() {
-    return RuntimeConfigurations.musicVolume / 10f;
+    return RuntimeConfigurations.musicVolume / 10f * 0.8f;
   }
 
   public static void setMusicVolume(int musicVolume) {

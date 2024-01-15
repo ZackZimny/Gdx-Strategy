@@ -6,6 +6,6 @@ public class RobotUnit extends PlayerUnit {
   public RobotUnit(Vector2 position) {
     super(position, "Robot");
     setHealth(300);
-    setAttackPower(6);
+    setAttackPower(5);
   }
 }

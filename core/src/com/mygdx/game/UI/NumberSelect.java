@@ -45,6 +45,12 @@ public class NumberSelect {
     return decreaseButton.isClicked(mousePos) || increaseButton.isClicked(mousePos);
   }
 
+  public void setPosition(Vector2 position) {
+    this.position = position;
+    decreaseButton.setRectangle(new Rectangle(position.x, position.y, sideLength, sideLength));
+    increaseButton.setRectangle(new Rectangle(position.x + padding + sideLength, position.y, sideLength, sideLength));
+  }
+
   public void setNumber(int number) {
     this.number = number;
   }

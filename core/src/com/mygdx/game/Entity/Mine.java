@@ -9,7 +9,7 @@ import com.mygdx.game.GameHelpers.ItemType;
 import java.util.List;
 
 public class Mine extends Building {
-  private int productionTime = 7;
+  private int productionTime = 4;
 
   public Mine(Grid grid, int tileX, int tileY) {
     super(grid, tileX, tileY, "Mine");

@@ -28,6 +28,14 @@ public class AssetManagerHandler {
     assetManager.load("Fight.mp3", Music.class);
     assetManager.load("Hit.wav", Sound.class);
     assetManager.load("Explosion.wav", Sound.class);
+    assetManager.load("BuildingTutorial.png", Texture.class);
+    assetManager.load("BuildingTutorial2.png", Texture.class);
+    assetManager.load("BuildingTutorial3.png", Texture.class);
+    assetManager.load("CommandingTroops.png", Texture.class);
+    assetManager.load("CommandingTroops2.png", Texture.class);
+    assetManager.load("Goal.png", Texture.class);
+    assetManager.load("MainMenu.png", Texture.class);
+    assetManager.load("Options.png", Texture.class);
   }
 
   public AssetManager getAssetManager() {

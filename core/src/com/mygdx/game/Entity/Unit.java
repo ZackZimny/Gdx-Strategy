@@ -51,8 +51,6 @@ public abstract class Unit extends Entity {
     arriveThroughTree = new CollidibleType[] { collidibleType };
   }
 
-  public abstract Color getColor();
-
   public void generateAnimations(AssetManager assetManager) {
     for (Direction direction : Direction.values()) {
       Texture texture = assetManager.get(name + "Walking" + direction.toString() + ".png", Texture.class);
@@ -74,7 +72,8 @@ public abstract class Unit extends Entity {
     while (currentDestination != null && !clearPath && iterationCount < (int) Math.ceil(360 / rotationCheck)) {
       for (Collidible collidible : collidibles) {
         if (collidibleDestination != null && collidibleDestination.equals(collidible)
-            || collidible.equals(getCollidible())) {
+            || collidible.equals(getCollidible())
+            || CollisionManager.overlappingColldibles(getCollidible(), collidible)) {
           continue;
         }
         Vector2 detectionEnd = getCenter().cpy().add(detection);
@@ -193,7 +192,6 @@ public abstract class Unit extends Entity {
       animation = velocity.y <= 0 ? animationMap.get(Direction.Down) : animationMap.get(Direction.Up);
     }
     TextureRegion frame;
-    Color line = stationary ? Color.BLUE : Color.RED;
     if (stationary) {
       frame = animationMap.get(Direction.Down).getKeyFrames()[0];
       stateTime = 0;
@@ -204,12 +202,6 @@ public abstract class Unit extends Entity {
     sb.begin();
     sb.draw(frame, center.x - frame.getRegionWidth() / 2, center.y - frame.getRegionHeight() / 2);
     sb.end();
-    sr.begin(ShapeType.Line);
-    sr.setColor(line);
-    sr.rect(rectangleCollidible.getX(), rectangleCollidible.getY(),
-        rectangleCollidible.getWidth(),
-        rectangleCollidible.getHeight());
-    sr.end();
   }
 
   public float getRenderOrderValue() {

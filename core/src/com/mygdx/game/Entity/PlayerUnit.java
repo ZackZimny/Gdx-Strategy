@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.CollidibleType;
+import com.mygdx.game.GameHelpers.CollisionManager;
 import com.mygdx.game.GameHelpers.GameLoop;
 import com.mygdx.game.GameHelpers.RuntimeConfigurations;
 import com.mygdx.game.GameHelpers.Selector;
@@ -46,8 +47,20 @@ public class PlayerUnit extends Unit {
     }
   }
 
+  private void handleOverlapping(List<PlayerUnit> units) {
+    if (getCurrentDestination() == null || stationary) {
+      for (Unit unit : units) {
+        if (CollisionManager.overlappingColldibles(unit.getCollidible(), getCollidible()) && !unit.equals(this)) {
+          setCurrentDestination(getCenter().cpy().add(50, 50));
+          unit.setCurrentDestination(unit.getCenter().cpy().add(-50, -50));
+        }
+      }
+    }
+  }
+
   @Override
   public void updateState(GameLoop gameState) {
+    handleOverlapping(gameState.getPlayerUnits());
     handleSelection(gameState.getSelector(), gameState.getMousePos());
     super.updateState(gameState);
   }
@@ -82,7 +95,7 @@ public class PlayerUnit extends Unit {
   protected void updateHealth(List<Unit> units, float deltaTime) {
     int prevHealth = getHealth();
     updateHealthOnCollisionWithUnitType(units, CollidibleType.EnemyUnit);
-    if (getHealth() != prevHealth && hitSoundTimer >= 1) {
+    if (getHealth() != prevHealth && hitSoundTimer >= 0.5f) {
       getHitSound().play(RuntimeConfigurations.getSfxVolumePercent());
       hitSoundTimer = 0;
       return;

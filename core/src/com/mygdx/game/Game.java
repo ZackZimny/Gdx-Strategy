@@ -1,7 +1,5 @@
 package com.mygdx.game;
 
-import javax.xml.crypto.Data;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -11,9 +9,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameHelpers.AssetManagerHandler;
-import com.mygdx.game.GameHelpers.DatabaseManager;
+import com.mygdx.game.GameHelpers.EventLogHandler;
 import com.mygdx.game.UI.ScreenManager;
 
 public class Game extends ApplicationAdapter {
@@ -33,6 +30,7 @@ public class Game extends ApplicationAdapter {
     viewport = new ScreenViewport(camera);
     assetManagerHandler = new AssetManagerHandler();
     assetManagerHandler.load();
+    EventLogHandler.start();
   }
 
   @Override
@@ -59,11 +57,13 @@ public class Game extends ApplicationAdapter {
     if (!postLoading) {
       screenManager.handleResize();
     }
-    System.out.println("After resize: " + new Vector2(screenWidth, screenHeight));
+    EventLogHandler.log(String.format("Screen resize: (%d, %d)", screenWidth, screenHeight));
   }
 
   @Override
   public void dispose() {
     batch.dispose();
+    sr.dispose();
+    assetManagerHandler.getAssetManager().dispose();
   }
 }

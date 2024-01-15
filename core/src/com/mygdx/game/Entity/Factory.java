@@ -5,13 +5,12 @@ import java.util.List;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.mygdx.game.GameHelpers.Collidible;
-import com.mygdx.game.GameHelpers.GameLoop;
 import com.mygdx.game.GameHelpers.Grid;
 import com.mygdx.game.GameHelpers.ItemLoad;
 import com.mygdx.game.GameHelpers.ItemType;
 
 public class Factory extends Building {
-  private int unitGenerationSeconds = 20;
+  private int unitGenerationSeconds = 15;
 
   public Factory(Grid grid, int tileX, int tileY) {
     super(grid, tileX, tileY, "Factory");

@@ -21,7 +21,7 @@ public class UIButton {
   // used to create text
   private final FontHandler fontHandler = new FontHandler();
   private final ScreenState screenState;
-  private final Rectangle rectangle;
+  private Rectangle rectangle;
 
   /**
    * Creates a Button at the specified position
@@ -73,5 +73,9 @@ public class UIButton {
    */
   public ScreenState getScreenState() {
     return screenState;
+  }
+
+  public void setRectangle(Rectangle rectangle) {
+    this.rectangle = rectangle;
   }
 }

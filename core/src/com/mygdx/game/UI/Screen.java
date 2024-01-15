@@ -42,21 +42,32 @@ public class Screen {
    *                           screen redirects
    */
   protected void createButtonColumn(LinkedHashMap<String, ScreenState> stringStateHashMap) {
+    Color[] colors = { Color.BLUE, Color.LIGHT_GRAY };
+    int i = 0;
+    for (String text : stringStateHashMap.keySet()) {
+      UIButton newButton = new UIButton(getButtonRectangle(i, stringStateHashMap.size()),
+          text, colors[i % colors.length], stringStateHashMap.get(text));
+      buttons.add(newButton);
+      stringButtonHashMap.put(text, newButton);
+      i++;
+    }
+  }
+
+  private Rectangle getButtonRectangle(int i, int buttonCount) {
     float screenWidth = Gdx.graphics.getWidth();
     float screenHeight = Gdx.graphics.getHeight();
     float buttonX = 20;
     float buttonHeight = screenHeight * 0.1f;
-    Color[] colors = { Color.BLUE, Color.LIGHT_GRAY };
-    float totalHeight = 40 + (stringStateHashMap.size() - 1) * (10f + buttonHeight);
+    float totalHeight = buttonCount * (10f + buttonHeight);
+    return new Rectangle(buttonX - screenWidth / 2f, totalHeight - ((10f + buttonHeight) * i) - screenHeight / 2f,
+        screenWidth - 40,
+        buttonHeight);
+  }
+
+  public void handleResize() {
     int i = 0;
-    for (String text : stringStateHashMap.keySet()) {
-      UIButton newButton = new UIButton(
-          new Rectangle(buttonX - screenWidth / 2f, totalHeight - ((10f + buttonHeight) * i) - screenHeight / 2f,
-              screenWidth - 40,
-              buttonHeight),
-          text, colors[i % colors.length], stringStateHashMap.get(text));
-      buttons.add(newButton);
-      stringButtonHashMap.put(text, newButton);
+    for (UIButton button : buttons) {
+      button.setRectangle(getButtonRectangle(i, stringButtonHashMap.size()));
       i++;
     }
   }
@@ -69,7 +80,7 @@ public class Screen {
   public void renderTitle(SpriteBatch spriteBatch) {
     spriteBatch.begin();
     float screenWidth = Gdx.graphics.getWidth();
-    float textY = Gdx.graphics.getHeight() / 2f - titleFontHandler.getFont().getLineHeight();
+    float textY = Gdx.graphics.getHeight() / 2f - titleFontHandler.getFont().getLineHeight() + 10;
     float textX = titleFontHandler.centerX(title, screenWidth);
     titleFontHandler.getFont().draw(spriteBatch, title, textX, textY);
     spriteBatch.end();

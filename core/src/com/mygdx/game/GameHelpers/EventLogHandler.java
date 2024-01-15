@@ -34,7 +34,7 @@ public class EventLogHandler {
    * @param message message to log
    */
   public static void log(String message) {
-    logs += message;
+    logs += message + "\n";
     logger.info(message);
   }
 

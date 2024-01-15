@@ -5,5 +5,7 @@ public enum ScreenState {
   GAME_OVER,
   MAIN_MENU,
   OPTIONS,
+  RECORDS,
+  TUTORIAL,
   EXIT
 }

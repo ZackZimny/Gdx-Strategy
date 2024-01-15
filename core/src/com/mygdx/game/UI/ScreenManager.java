@@ -2,17 +2,11 @@ package com.mygdx.game.UI;
 
 import java.util.HashMap;
 
-import javax.xml.crypto.Data;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.particles.ParticleShader.Inputs;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -30,6 +24,8 @@ public class ScreenManager {
   private Screen currentScreen;
   private MainMenuScreen mainMenuScreen = new MainMenuScreen();
   private ExitScreen exitScreen = new ExitScreen();
+  private RecordsScreen recordsScreen = new RecordsScreen();
+  private TutorialScreen tutorialScreen = new TutorialScreen();
   private OptionsScreen optionsScreen;
   private Music calmMusic;
   private Music fightMusic;
@@ -42,6 +38,7 @@ public class ScreenManager {
     screenHashMap.put(ScreenState.GAME_OVER, gameOverScreen);
     screenHashMap.put(ScreenState.GAME_LOOP, gameLoop);
     screenHashMap.put(ScreenState.MAIN_MENU, mainMenuScreen);
+    screenHashMap.put(ScreenState.RECORDS, recordsScreen);
     screenHashMap.put(ScreenState.EXIT, exitScreen);
     currentScreen = mainMenuScreen;
     calmMusic = assetManager.get("Calm.mp3", Music.class);
@@ -53,7 +50,9 @@ public class ScreenManager {
     DatabaseManager.getRuntimeConfigurations();
     optionsScreen = new OptionsScreen();
     optionsScreen.loadSounds(assetManager);
+    tutorialScreen.loadImages(assetManager);
     screenHashMap.put(ScreenState.OPTIONS, optionsScreen);
+    screenHashMap.put(ScreenState.TUTORIAL, tutorialScreen);
     calmMusic.setVolume(RuntimeConfigurations.getMusicVolumePercent());
     fightMusic.setVolume(RuntimeConfigurations.getMusicVolumePercent());
   }
@@ -78,10 +77,10 @@ public class ScreenManager {
     if (screenState == ScreenState.GAME_LOOP) {
       gameLoop.update(viewport, assetManager);
       gameLoop.render(sb, sr, mousePos, deltaTime);
-      if (gameLoop.getEnemyCountOnScreen() >= 3) {
+      if (gameLoop.getPlayerUnits().size() <= 2 && !fightMusic.isPlaying()) {
         fightMusic.play();
         calmMusic.stop();
-      } else {
+      } else if (gameLoop.getPlayerUnits().size() > 2 && !calmMusic.isPlaying()) {
         calmMusic.play();
         fightMusic.stop();
       }
@@ -95,9 +94,14 @@ public class ScreenManager {
       if (screenState == ScreenState.OPTIONS) {
         calmMusic.setVolume(RuntimeConfigurations.getMusicVolumePercent());
         fightMusic.setVolume(RuntimeConfigurations.getMusicVolume());
+      } else if (screenState == ScreenState.MAIN_MENU
+          && currentScreen.getStringButtonHashMap().get("Records").isClicked(mousePos)) {
+        recordsScreen.setRecordString(DatabaseManager.getRecordString());
       }
-      fightMusic.stop();
-      calmMusic.play();
+      if (!calmMusic.isPlaying()) {
+        fightMusic.stop();
+        calmMusic.play();
+      }
       screenState = currentScreen.getScreenState(mousePos);
       currentScreen = screenHashMap.get(screenState);
       currentScreen.render(sb, sr, mousePos, deltaTime);
@@ -106,6 +110,9 @@ public class ScreenManager {
 
   public void handleResize() {
     gameLoop.handleResize();
+    for (Screen screen : screenHashMap.values()) {
+      screen.handleResize();
+    }
   }
 
   public Vector2 getMousePos() {
