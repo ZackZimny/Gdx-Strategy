@@ -9,31 +9,58 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * Button used during game loop
+ **/
 public class GameButton {
   private Rectangle rectangle;
   private ButtonAction action;
   private FontHandler fontHandler;
   private String description = null;
 
+  /**
+   * @param ButtonAction action corresponding to this GameButton
+   * @param rectangle    button bounding box
+   * @param fontHandler  renders fonts
+   **/
   public GameButton(ButtonAction action, Rectangle rectangle, FontHandler fontHandler) {
     this.action = action;
     this.rectangle = rectangle;
     this.fontHandler = fontHandler;
   }
 
+  /**
+   * @param ButtonAction action corresponding to this GameButton
+   * @param description  description about this button
+   * @param rectangle    button bounding box
+   * @param fontHandler  renders fonts
+   **/
   public GameButton(ButtonAction action, String description, Rectangle rectangle, FontHandler fontHandler) {
     this(action, rectangle, fontHandler);
     this.description = description;
   }
 
+  /**
+   * @param mousePos mouse position in the game world
+   * @return true if the mouse is in the button, false otherwise
+   **/
   public boolean isHovered(Vector2 mousePos) {
     return rectangle.contains(mousePos);
   }
 
+  /**
+   * @param mousePos mouse position in the game world
+   * @return true if the mouse is in the button and clicked, false otherwise
+   **/
   public boolean isClicked(Vector2 mousePos) {
     return isHovered(mousePos) && Gdx.input.isButtonPressed(Input.Buttons.LEFT);
   }
 
+  /**
+   * @param sb       SpriteBatch that displays this button to the screen
+   * @param sr       ShapeRenderer that displays rectangle background
+   * @param mousePos mouse position in the game world
+   **/
   public void render(SpriteBatch sb, ShapeRenderer sr, Vector2 mousePos) {
     Color color = Color.RED;
     if (isClicked(mousePos)) {

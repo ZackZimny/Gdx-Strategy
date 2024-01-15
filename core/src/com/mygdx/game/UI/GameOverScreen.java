@@ -25,12 +25,6 @@ public class GameOverScreen extends Screen {
     createButtonColumn(screenStateMap);
   }
 
-  /**
-   * displays the GameOverScreen
-   * 
-   * @param shapeRenderer displays button rectangles
-   * @param spriteBatch   renders text
-   */
   @Override
   public void render(SpriteBatch sb, ShapeRenderer sr, Vector2 mousePos, float deltaTime) {
     ScreenManager.renderBackground(sr, Color.RED);

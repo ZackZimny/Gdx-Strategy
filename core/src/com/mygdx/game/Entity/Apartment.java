@@ -30,8 +30,8 @@ public class Apartment extends Building {
    *                     used to initialize new human units
    * @param collidible   list of all of the collidibles on the map; used to
    *                     prevent units from spawning upon one another
-   * @returns a player Unit if it is time to create one or null if the new unit is
-   *          not ready to spawn
+   * @return a player Unit if it is time to create one or null if the new unit is
+   *         not ready to spawn
    **/
   public PlayerUnit createUnits(AssetManager assetManager, List<Collidible> collidibles) {
     HumanUnit humanUnit = null;
@@ -52,7 +52,7 @@ public class Apartment extends Building {
   }
 
   /**
-   * @returns description used on the BuildButton for this Entity
+   * @return description used on the BuildButton for this Entity
    **/
   public String getDescription() {
     return "Creates Human units. \n" + super.getDescription();

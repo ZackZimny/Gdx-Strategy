@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * Allows the user to increase or decrease a setting with text
+ **/
 public class NumberSelect {
   private String text;
   private Vector2 position;
@@ -16,6 +19,10 @@ public class NumberSelect {
   private float padding = 5;
   private int number = 5;
 
+  /**
+   * @param text     text to display next to buttons
+   * @param position position of the bottom left corner of the left button
+   **/
   public NumberSelect(String text, Vector2 position) {
     this.text = text;
     this.position = position;

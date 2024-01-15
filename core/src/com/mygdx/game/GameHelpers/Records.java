@@ -15,6 +15,13 @@ public class Records {
     }
   }
 
+  /**
+   * adds a record to the records map and check if it matches any records on file.
+   * If not, an error is thrown to the CrashLogHandler
+   * 
+   * @param record String to match to current records
+   * @param amount number to associate with record
+   **/
   public void addRecord(String record, int amount) {
     try {
       for (String name : recordsStrings) {
@@ -29,14 +36,26 @@ public class Records {
     }
   }
 
+  /**
+   * @return LinkedHashMap<String, Integer> pairs with a valid records as the
+   *         Strings and their corresponding amounts
+   **/
   public LinkedHashMap<String, Integer> getRecordsMap() {
     return recordsMap;
   }
 
+  /**
+   * @param LinkedHashMap<String, Integer> overwrites this object's pairs with a
+   *                              valid records as the Strings and their
+   *                              corresponding amounts
+   **/
   public void setRecordsMap(LinkedHashMap<String, Integer> recordsMap) {
     this.recordsMap = recordsMap;
   }
 
+  /**
+   * @return all valid Strings for a record
+   **/
   public static String[] getRecordsStrings() {
     return recordsStrings;
   }

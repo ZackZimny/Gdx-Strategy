@@ -65,12 +65,18 @@ public class OptionsScreen extends Screen {
     }
   }
 
+  /**
+   * updates RuntimeConfigurations in the UI
+   **/
   private void syncWithRuntimeConfigurations() {
     fullScreenCheckBox.setIsOn(RuntimeConfigurations.isFullScreen());
     soundEffectsSelect.setNumber(RuntimeConfigurations.getSfxVolume());
     musicSelect.setNumber(RuntimeConfigurations.getMusicVolume());
   }
 
+  /**
+   * updates runtimeConfigurations from the UI
+   **/
   private void syncRuntimeConfigurations() {
     RuntimeConfigurations.setSfxVolume(soundEffectsSelect.getNumber());
     RuntimeConfigurations.setMusicVolume(musicSelect.getNumber());

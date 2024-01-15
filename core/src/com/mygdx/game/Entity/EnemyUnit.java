@@ -61,7 +61,7 @@ public class EnemyUnit extends Unit {
    * finds the entity overlapping with this EnemyUnit's currentDestination
    * 
    * @param entities full list containing all entities in the game world
-   * @returns entity that this EnemyUnit is currently chasing
+   * @return entity that this EnemyUnit is currently chasing
    **/
   @Override
   protected Entity getEntityDestination(final List<Entity> entities) {

@@ -65,15 +65,15 @@ public abstract class Building extends Entity {
    * @param assetManager fully loaded assetManager with textures to spawn new
    *                     units
    * @param collidibles  full list of collidibles used to validate new spawn point
-   * @returns null if it is not time to create a unit or a player unit not
-   *          overlapping with other collidibles when it's time
+   * @return null if it is not time to create a unit or a player unit not
+   *         overlapping with other collidibles when it's time
    **/
   public abstract PlayerUnit createUnits(AssetManager assetManager, List<Collidible> collidibles);
 
   /**
    * creates resources when time is ready
    * 
-   * @returns ItemLoad that contains the amount and type of a resource made
+   * @return ItemLoad that contains the amount and type of a resource made
    **/
   public abstract ItemLoad createResources();
 
@@ -115,14 +115,14 @@ public abstract class Building extends Entity {
    * creates a list of all edges of the isometric tile that this building lays
    * upon
    * 
-   * @returns Vector2[] containing all edges
+   * @return Vector2[] containing all edges
    **/
   public Vector2[] getVertices() {
     return grid.getVertices(tileX, tileY);
   }
 
   /**
-   * @returns x position in isometric coordinates
+   * @return x position in isometric coordinates
    **/
   public int getTileX() {
     return tileX;
@@ -139,8 +139,8 @@ public abstract class Building extends Entity {
    * @param start starting position of the line to check for collision
    * @param end   ending position of the line to check for collision (start and
    *              end are reversible)
-   * @returns true if the line overlaps with the isometric tile that this building
-   *          is on and false if it doesn't
+   * @return true if the line overlaps with the isometric tile that this building
+   *         is on and false if it doesn't
    **/
   public boolean lineCollide(final Vector2 start, final Vector2 end) {
     return getCollidible().lineCollide(start, end);
@@ -163,8 +163,8 @@ public abstract class Building extends Entity {
    * parameter rectangle
    * 
    * @param rectangle rectangle to do the collision test against
-   * @returns true if the tile overlaps with the paramter rectangle, false if the
-   *          tile does not overlap
+   * @return true if the tile overlaps with the paramter rectangle, false if the
+   *         tile does not overlap
    **/
   public boolean rectangleCollide(final Rectangle rectangle) {
     // loops through each line that makes up the isometric tile and checks if it
@@ -183,8 +183,8 @@ public abstract class Building extends Entity {
    * point (Vector2)
    * 
    * @param point point to check collision against
-   * @returns true if the point overlaps with this isometric tile, false if the
-   *          point does not
+   * @return true if the point overlaps with this isometric tile, false if the
+   *         point does not
    **/
   public boolean pointCollide(final Vector2 point) {
     // changes Vector2[] to float[] to use Libgdx's polygon.contains(Vector2 point)
@@ -200,57 +200,57 @@ public abstract class Building extends Entity {
   }
 
   /**
-   * @returns a ranking value related to the y position of the building. This
-   *          value is used to render entities in order. Buildings tends to have a
-   *          higher value so that units and other moving entities can move behind
-   *          them.
+   * @return a ranking value related to the y position of the building. This
+   *         value is used to render entities in order. Buildings tends to have a
+   *         higher value so that units and other moving entities can move behind
+   *         them.
    **/
   public float getRenderOrderValue() {
     return (float) (getCenter().y + grid.getTileHeight() * 2);
   }
 
   /**
-   * @returns CollidibleType.Building to signify that this Entity is a Building;
-   *          especially important for children
+   * @return CollidibleType.Building to signify that this Entity is a Building;
+   *         especially important for children
    **/
   public CollidibleType getCollidibleType() {
     return CollidibleType.Building;
   }
 
   /**
-   * @returns grid containing the information for other buildings and methods for
-   *          transferring between real and isometric coordinates
+   * @return grid containing the information for other buildings and methods for
+   *         transferring between real and isometric coordinates
    **/
   public Grid getGrid() {
     return grid;
   }
 
   /**
-   * @returns texture used to draw this building
+   * @return texture used to draw this building
    **/
   public Texture getTexture() {
     return texture;
   }
 
   /**
-   * @returns name that is the same as the png file in the asset folder (does not
-   *          include .png)
+   * @return name that is the same as the png file in the asset folder (does not
+   *         include .png)
    **/
   public String getName() {
     return name;
   }
 
   /**
-   * @returns how many seconds have elapsed since a resouce was last created or
-   *          the game round started
+   * @return how many seconds have elapsed since a resouce was last created or
+   *         the game round started
    **/
   public float getResourceTimer() {
     return resourceTimer;
   }
 
   /**
-   * @returns how many seconds have elapsed since a unit was spawned or the game
-   *          round started
+   * @return how many seconds have elapsed since a unit was spawned or the game
+   *         round started
    **/
   public float getUnitTimer() {
     return unitTimer;
@@ -267,8 +267,8 @@ public abstract class Building extends Entity {
   }
 
   /**
-   * @returns hashmap that contains the ItemType and amount (Integer) of resources
-   *          that must be consumed to create this building
+   * @return hashmap that contains the ItemType and amount (Integer) of resources
+   *         that must be consumed to create this building
    **/
   public HashMap<ItemType, Integer> getResourcesRequiredToBuild() {
     return resourcesRequiredToBuild;
@@ -280,7 +280,7 @@ public abstract class Building extends Entity {
    * 
    * @param collidibles complete list of collidibles to prevent spawning on
    *                    another collidible
-   * @returns Vector2 position where no other units overlap
+   * @return Vector2 position where no other units overlap
    **/
   protected Vector2 generateRandomPosition(final List<Collidible> collidibles) {
     final float degrees = (float) Math.random() * 360;
@@ -315,7 +315,7 @@ public abstract class Building extends Entity {
    * 
    * @param collidibles complete list of collidibles used to verify position
    * @param position    Vector2 to check if position is safe
-   * @returns true if the spawn point is empty, false if it isn't
+   * @return true if the spawn point is empty, false if it isn't
    **/
   private boolean isValidSpawn(final List<Collidible> collidibles, final Vector2 position) {
     return collidibles.stream()

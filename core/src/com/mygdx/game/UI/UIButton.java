@@ -58,10 +58,18 @@ public class UIButton {
     spriteBatch.end();
   }
 
+  /**
+   * @param mousePos mouse position in the world
+   * @return true if the mouse is in the button, false otherwise
+   **/
   public boolean isHovered(Vector2 mousePos) {
     return rectangle.contains(mousePos);
   }
 
+  /**
+   * @param mousePos mouse position in the world
+   * @return true if the mouse is in the button and clicked, false otherwise
+   **/
   public boolean isClicked(Vector2 mousePos) {
     return isHovered(mousePos) && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT);
   }

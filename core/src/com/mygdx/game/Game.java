@@ -13,6 +13,9 @@ import com.mygdx.game.GameHelpers.AssetManagerHandler;
 import com.mygdx.game.GameHelpers.EventLogHandler;
 import com.mygdx.game.UI.ScreenManager;
 
+/**
+ * Runs the main game functions
+ **/
 public class Game extends ApplicationAdapter {
   SpriteBatch batch;
   ShapeRenderer sr;
@@ -22,6 +25,9 @@ public class Game extends ApplicationAdapter {
   OrthographicCamera camera;
   ScreenManager screenManager;
 
+  /**
+   * Runs once on application startup
+   **/
   @Override
   public void create() {
     batch = new SpriteBatch();
@@ -33,6 +39,9 @@ public class Game extends ApplicationAdapter {
     EventLogHandler.start();
   }
 
+  /**
+   * Runs every frame
+   **/
   @Override
   public void render() {
     ScreenUtils.clear(0.2f, 0.5f, 0.3f, 1);
@@ -51,6 +60,9 @@ public class Game extends ApplicationAdapter {
     }
   }
 
+  /**
+   * Runs every time the screen is resized
+   **/
   @Override
   public void resize(int screenWidth, int screenHeight) {
     viewport.update(screenWidth, screenHeight);
@@ -60,6 +72,9 @@ public class Game extends ApplicationAdapter {
     EventLogHandler.log(String.format("Screen resize: (%d, %d)", screenWidth, screenHeight));
   }
 
+  /**
+   * Runs when the application is closed
+   **/
   @Override
   public void dispose() {
     batch.dispose();

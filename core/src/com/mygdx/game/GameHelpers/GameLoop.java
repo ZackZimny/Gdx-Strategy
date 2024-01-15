@@ -1,21 +1,16 @@
 package com.mygdx.game.GameHelpers;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.Entity.Apartment;
@@ -212,7 +207,7 @@ public class GameLoop extends Screen {
   private void handleDespawn() {
     ArrayList<Entity> entitiesCopy = new ArrayList<>();
     for (Entity entity : entities) {
-      if (!entity.isDead()) {
+      if (!entity.willDespawn()) {
         entitiesCopy.add(entity);
       } else if (entity instanceof EnemyUnit) {
         enemiesBeaten++;
@@ -277,6 +272,7 @@ public class GameLoop extends Screen {
     Records records = new Records();
     records.addRecord("Top Score", enemiesBeaten);
     records.addRecord("Enemies Beaten", enemiesBeaten);
+    records.addRecord("Games Played", 1);
     for (SpawnType type : spawnCounts.keySet()) {
       switch (type) {
         case HUMAN:
@@ -321,7 +317,7 @@ public class GameLoop extends Screen {
    * that class
    * 
    * @param class filters and casts the entities by this class
-   * @returns filtered and casted list of entities
+   * @return filtered and casted list of entities
    **/
   public <T extends Entity> List<T> getEntitiesByType(Class<T> type) {
     return entities.stream()
@@ -387,8 +383,8 @@ public class GameLoop extends Screen {
   }
 
   /**
-   * @returns screenState that is either GAME_LOOP if the game is still running or
-   *          GAME_OVER if all player units have despawned
+   * @return screenState that is either GAME_LOOP if the game is still running or
+   *         GAME_OVER if all player units have despawned
    **/
   public ScreenState getScreenState() {
     return screenState;
@@ -402,37 +398,59 @@ public class GameLoop extends Screen {
   }
 
   /**
-   * @returns grid object that contains the positions of all of the buildings on
-   *          the grid and isometric conversion functions
+   * @return grid object that contains the positions of all of the buildings on
+   *         the grid and isometric conversion functions
    **/
   public Grid getGrid() {
     return grid;
   }
 
+  /**
+   * @return selector object that contains the bounding box created from the click
+   *         and drag gesture by the player
+   **/
   public Selector getSelector() {
     return selector;
   }
 
+  /**
+   * @return list of all entities on the map
+   **/
   public List<Entity> getEntities() {
     return entities;
   }
 
+  /**
+   * @return object containing all ActionButtons that the player uses in the game
+   **/
   public ButtonGroup getButtonGroup() {
     return buttonGroup;
   }
 
+  /**
+   * @return time between frame renders in seconds
+   **/
   public float getDeltaTime() {
     return deltaTime;
   }
 
+  /**
+   * @return the current action the player has selected through the ButtonGroup
+   **/
   public ButtonAction getButtonAction() {
     return buttonAction;
   }
 
+  /**
+   * @return list of all collidibles on the map
+   **/
   public List<Collidible> getCollidibles() {
     return collidibles;
   }
 
+  /**
+   * @return list of all PlayerUnits on the map
+   **/
   public List<PlayerUnit> getPlayerUnits() {
     return playerUnits;
   }

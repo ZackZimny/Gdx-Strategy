@@ -16,7 +16,7 @@ public class CrashLogHandler {
   private static final SimpleFormatter simpleFormatter = new SimpleFormatter();
 
   /**
-   * Loads the CrashLogger
+   * Loads the CrashLogger, which writes into a crash.txt text file
    */
   public static void start() {
     try {
@@ -43,7 +43,7 @@ public class CrashLogHandler {
     JOptionPane.showMessageDialog(null, message +
         "\nPlease restart the game. " +
         "\nIf this problem persists, please email us the crash.txt file located in the root folder. Email us at"
-        + " developers@cognitiveThought.com.\nReport:\n" + report);
+        + " developers@vernegame.com (fake address).\nReport:\n" + report);
     System.exit(0);
   }
 

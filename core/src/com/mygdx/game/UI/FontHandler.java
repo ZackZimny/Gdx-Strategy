@@ -29,6 +29,12 @@ public class FontHandler {
     smallFont = fontGenerator.generateFont(parameter);
   }
 
+  /**
+   * loads the font with the given size and color
+   * 
+   * @param size  fontSize of the text
+   * @param color color of the text
+   **/
   public FontHandler(int size, Color color) {
     fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("FFFFORWA.TTF"));
     parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -51,20 +57,32 @@ public class FontHandler {
     return -layout.width / 2;
   }
 
+  /**
+   * @return textHeight in pixels for defualt font
+   **/
   public float getTextHeight(String text) {
     layout.setText(font, text);
     return layout.height;
   }
 
+  /**
+   * @return textWidth in pixels for defualt font
+   **/
   public float getTextWidth(String text) {
     layout.setText(font, text);
     return layout.width;
   }
 
+  /**
+   * @return font with default size
+   **/
   public BitmapFont getFont() {
     return font;
   }
 
+  /**
+   * @return font with smaller size
+   **/
   public BitmapFont getSmallFont() {
     return smallFont;
   }

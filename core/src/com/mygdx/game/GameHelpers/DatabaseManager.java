@@ -50,7 +50,7 @@ public class DatabaseManager {
       Statement stmt = conn.createStatement();
       ResultSet rs = stmt.executeQuery(sql);
       conn.close();
-      // rs.next() returns if there is a result from the ResultSet
+      EventLogHandler.log("Table " + table + " has successfully been checked if it was empty.");
       return !rs.next();
     } catch (SQLException e) {
       CrashLogHandler.logSevere("There has been an issue determining if a table is empty. ",
@@ -60,6 +60,10 @@ public class DatabaseManager {
     }
   }
 
+  /**
+   * creates records and runtime_configurations tables if they do not exist
+   * already
+   **/
   public static void createTables() {
     try {
       String sql = "CREATE TABLE IF NOT EXISTS runtime_configurations(musicVolume INTEGER NOT NULL," +
@@ -74,6 +78,7 @@ public class DatabaseManager {
       }
       sql = "CREATE TABLE IF NOT EXISTS records(record TEXT NOT NULL, count INTEGER NOT NULL)";
       runSql(sql);
+      EventLogHandler.log("records table has successfully been created or accessed. ");
       if (tableIsEmpty("records")) {
         sql = "INSERT INTO records(record, count) VALUES ";
         for (String record : Records.getRecordsStrings()) {
@@ -81,20 +86,24 @@ public class DatabaseManager {
         }
         // removes the final comma from the sql
         sql = sql.substring(0, sql.length() - 1);
-        System.out.println(sql);
         runSql(sql);
+        System.out.println("Default data has been inserted into the records table");
       }
     } catch (SQLException e) {
       CrashLogHandler.logSevere("There has been an issue creating tables in the database. ", e.getMessage());
     }
   }
 
+  /**
+   * @return top score gathered from the database
+   **/
   public static int getTopScore() {
     try {
       String sql = "SELECT * FROM records WHERE record LIKE 'Top Score'";
       Connection connection = connect();
       Statement statement = connection.createStatement();
       ResultSet resultSet = statement.executeQuery(sql);
+      EventLogHandler.log("Top Score has been accessed");
       return resultSet.getInt(1);
     } catch (SQLException e) {
       CrashLogHandler.logSevere("There has been an issue getting the player's high score.", e.getMessage());
@@ -102,10 +111,14 @@ public class DatabaseManager {
     return -1;
   }
 
+  /**
+   * updates records database table using the paramter passed int
+   * 
+   * @param records records created during the last game session
+   **/
   public static void updateRecords(Records records) {
     try {
       Records previousRecords = DatabaseManager.getRecords();
-      records.getRecordsMap().put("Games Played", previousRecords.getRecordsMap().get("Games Played") + 1);
       for (String record : Records.getRecordsStrings()) {
         if (!record.equals("Top Score")) {
           int previousCount = previousRecords.getRecordsMap().get(record);
@@ -127,12 +140,17 @@ public class DatabaseManager {
         String sql = String.format("UPDATE records SET count = %d WHERE record = '%s'",
             records.getRecordsMap().get(record), record);
         runSql(sql);
+        EventLogHandler.log("records table has been updated.");
       }
     } catch (SQLException e) {
       CrashLogHandler.logSevere("There has been an issue updating records.", e.getMessage());
     }
   }
 
+  /**
+   * @return a String containing all records within the records table of the
+   *         database
+   **/
   public static String getRecordString() {
     String result = "";
     try {
@@ -144,12 +162,17 @@ public class DatabaseManager {
         result += resultSet.getString(1) + ": " + resultSet.getInt(2) + "\n";
       }
       connection.close();
+      EventLogHandler.log("Record String has been made");
     } catch (SQLException e) {
       CrashLogHandler.logSevere("There has been an issue gathering records.", e.getMessage());
     }
     return result;
   }
 
+  /**
+   * @return all records in the records table in the database serialized to a
+   *         Records object
+   **/
   public static Records getRecords() {
     Records result = new Records();
     try {
@@ -160,6 +183,7 @@ public class DatabaseManager {
       while (resultSet.next()) {
         result.addRecord(resultSet.getString(1), resultSet.getInt(2));
       }
+      EventLogHandler.log("records table has successfully been parsed. ");
     } catch (SQLException e) {
       CrashLogHandler.logSevere("There has been an issue gathering a records object", e.getMessage());
     }

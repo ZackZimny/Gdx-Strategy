@@ -1,5 +1,8 @@
 package com.mygdx.game.UI;
 
+/**
+ * contains all the possible actions the player do during the Game Loop
+ **/
 public enum ButtonAction {
   Move,
   Fight,
@@ -8,7 +11,4 @@ public enum ButtonAction {
   Apartment,
   Factory,
   Generator,
-  Play_Game,
-  Tutorial,
-  Settings
 }

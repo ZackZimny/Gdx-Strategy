@@ -2,6 +2,9 @@ package com.mygdx.game.UI;
 
 import java.util.LinkedHashMap;
 
+/**
+ * First screen the user boots into on application startup
+ **/
 public class MainMenuScreen extends Screen {
   public MainMenuScreen() {
     super("Verne", ScreenState.MAIN_MENU);

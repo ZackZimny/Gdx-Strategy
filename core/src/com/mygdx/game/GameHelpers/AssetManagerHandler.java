@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class AssetManagerHandler {
   private AssetManager assetManager;
@@ -12,32 +13,74 @@ public class AssetManagerHandler {
     assetManager = new AssetManager();
   }
 
+  /**
+   * Loads texture into the AssetManager and logs it
+   * 
+   * @param path location in the asset folder where this texture is located
+   **/
+  private void loadTexture(String path) {
+    try {
+      assetManager.load(path, Texture.class);
+      EventLogHandler.log("Texture " + path + " loaded successfully.");
+    } catch (GdxRuntimeException e) {
+      CrashLogHandler.logSevere("There was an error loading " + path, e.getMessage());
+    }
+  }
+
+  /**
+   * Loads sound into the AssetManager and logs it
+   * 
+   * @param path location in the asset folder where this sound is located
+   **/
+  private void loadSound(String path) {
+    try {
+      assetManager.load(path, Sound.class);
+      EventLogHandler.log("Texture " + path + " loaded successfully.");
+    } catch (GdxRuntimeException e) {
+      CrashLogHandler.logSevere("There was an error loading " + path, e.getMessage());
+    }
+  }
+
+  /**
+   * Loads music into the AssetManager and logs it
+   * 
+   * @param path location in the asset folder where this music is located
+   **/
+  private void loadMusic(String path) {
+    try {
+      assetManager.load(path, Music.class);
+      EventLogHandler.log("Texture " + path + " loaded successfully.");
+    } catch (GdxRuntimeException e) {
+      CrashLogHandler.logSevere("There was an error loading " + path, e.getMessage());
+    }
+  }
+
+  /**
+   * loads in all textures, sounds, and music at once into the AssetManager
+   **/
   public void load() {
     String[] units = new String[] { "Human", "Enemy", "Robot" };
     String[] directions = new String[] { "Up", "Right", "Left", "Down" };
     for (String unit : units) {
       for (String direction : directions) {
-        assetManager.load(unit + "Walking" + direction + ".png", Texture.class);
+        loadTexture(unit + "Walking" + direction + ".png");
       }
     }
-    assetManager.load("Apartment.png", Texture.class);
-    assetManager.load("Generator.png", Texture.class);
-    assetManager.load("Mine.png", Texture.class);
-    assetManager.load("Factory.png", Texture.class);
-    assetManager.load("Calm.mp3", Music.class);
-    assetManager.load("Fight.mp3", Music.class);
-    assetManager.load("Hit.wav", Sound.class);
-    assetManager.load("Explosion.wav", Sound.class);
-    assetManager.load("BuildingTutorial.png", Texture.class);
-    assetManager.load("BuildingTutorial2.png", Texture.class);
-    assetManager.load("BuildingTutorial3.png", Texture.class);
-    assetManager.load("CommandingTroops.png", Texture.class);
-    assetManager.load("CommandingTroops2.png", Texture.class);
-    assetManager.load("Goal.png", Texture.class);
-    assetManager.load("MainMenu.png", Texture.class);
-    assetManager.load("Options.png", Texture.class);
+    String[] textures = new String[] { "Apartment.png", "Generator.png", "Mine.png", "Factory.png",
+        "BuildingTutorial.png", "BuildingTutorial2.png", "BuildingTutorial3.png", "CommandingTroops.png",
+        "CommandingTroops2.png", "Goal.png", "MainMenu.png", "Options.png" };
+    for (String texture : textures) {
+      loadTexture(texture);
+    }
+    loadMusic("Calm.mp3");
+    loadMusic("Fight.mp3");
+    loadSound("Hit.wav");
+    loadSound("Explosion.wav");
   }
 
+  /**
+   * @return a fully loaded assetManager if this is called after the load method
+   **/
   public AssetManager getAssetManager() {
     return assetManager;
   }
